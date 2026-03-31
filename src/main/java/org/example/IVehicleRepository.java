@@ -16,7 +16,4 @@ public interface IVehicleRepository
 
     List<Vehicle> getVehicles();
 
-    void load();
-
-    void save();
 }

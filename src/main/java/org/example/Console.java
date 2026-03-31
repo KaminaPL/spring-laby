@@ -11,15 +11,15 @@ public class Console
 
     private Status status;
     private User user;
-    private IVehicleRepository vehicleRepository;
-    private IUserRepository userRepository;
+    private VehicleRepositoryImpl vehicleRepository;
+    private UserRepositoryImpl userRepository;
+    private Authentication auth;
 
 
-    public Console(User user)
+    public Console()
     {
-        this.user = user;
         status = Status.ONGOING;
-        userRepository = new UserRepositoryImpl("/home/bartosz/users.csv");
+        auth = new Authentication();
     }
 
 
@@ -37,7 +37,55 @@ public class Console
     {
         System.out.print('\n');
 
-        if(vehicleRepository == null)
+        if(user == null || user.getLogin() == null)
+        {
+            if(args[0].compareTo("login") == 0)
+            {
+                if(args.length < 3)
+                {
+                    System.out.println("Too few arguments");
+                }
+                else if(args.length > 3)
+                {
+                    System.out.println("Too many arguments");
+                }
+                else
+                {
+                    user = auth.authenticate(args[1], args[2]);
+                }
+
+                if(user != null && user.getLogin() != null)
+                {
+                    System.out.println("Hello " + user.getLogin() + "! Welcome back!");
+                    System.out.println("To open repository type `open`. " +
+                            "When your work is done remember to type `leave` to save changes and leave program.");
+                }
+            }
+            else if(args[0].compareTo("register") == 0)
+            {
+                if(args.length < 4)
+                {
+                    System.out.println("Too few arguments");
+                }
+                else if(args.length > 4)
+                {
+                    System.out.println("Too many arguments");
+                }
+                else
+                {
+                   auth.register(args[1], args[2], args[3]);
+                }
+            }
+            else
+            {
+                System.out.println("Invalid command, try `login (login) (password)` or `register (login) (password) (confirm password)`.");
+            }
+
+            System.out.print('\n');
+
+            return;
+        }
+        else if(vehicleRepository == null)
         {
             if(args[0].compareTo("open") == 0)
             {
@@ -47,7 +95,7 @@ public class Console
             }
             else
             {
-                System.out.println("Connect to repository first by typing `open`.");
+                System.out.println("Connect by typing `open`.");
             }
 
             System.out.print('\n');
@@ -62,6 +110,10 @@ public class Console
                 vehicleRepository.save();
                 userRepository.save();
                 setCurrentStatus(Status.TERMINATED);
+            }
+            else if(args[0].compareTo("list") == 0)
+            {
+                showItems();
             }
             else if(args[0].compareTo("rent") == 0)
             {
@@ -80,17 +132,13 @@ public class Console
             }
             else if(args[0].compareTo("return") == 0)
             {
-                if(args.length < 2)
-                {
-                    System.out.println("Too few arguments.");
-                }
-                else if(args.length > 2)
+                if(args.length > 1)
                 {
                     System.out.println("Too many arguments.");
                 }
                 else
                 {
-                    returnItem(args[1]);
+                    returnItem(user.getRentedVehicleId().toString());
                 }
             }
             else if(args[0].compareTo("help") == 0)
@@ -128,7 +176,7 @@ public class Console
             {
                 getUserData(user);
             }
-            else if(args[0].compareTo("add") == 0)
+            else if(args[0].compareTo("vadd") == 0)
             {
                 if(args.length < 6)
                 {
@@ -147,7 +195,7 @@ public class Console
                     addItem(args);
                 }
             }
-            else if(args[0].compareTo("remove") == 0)
+            else if(args[0].compareTo("vremove") == 0)
             {
                 if(args.length < 2)
                 {
@@ -162,14 +210,30 @@ public class Console
                    removeItem(args[1]);
                 }
             }
+            else if(args[0].compareTo("uremove") == 0)
+            {
+                if(args.length < 2)
+                {
+                    System.out.println("Too few arguments.");
+                }
+                else if(args.length > 2)
+                {
+                    System.out.println("Too many arguments.");
+                }
+                else
+                {
+                    removeUser(args[1]);
+                }
+            }
             else if(args[0].compareTo("help") == 0)
             {
                 System.out.println("Commands:");
                 System.out.println("leave - close program\nopen - connect to repository\nwhoami - display your data");
                 System.out.println("list - list all items from repository\nusers - list all users");
-                System.out.println("add (type) (brand) (model) (year) (price) when vehicle is motorcycle: (license category) - adds vehicle with given data");
+                System.out.println("vadd (type) (brand) (model) (year) (price) when vehicle is motorcycle: (license category) - adds vehicle with given data");
                 System.out.println("example: add CAR Volkswagen T-Roc 2020 15000\n");
-                System.out.println("remove (id) - removes vehicle with given id\n");
+                System.out.println("vremove (id) - removes vehicle with given id\n");
+                System.out.println("uremove (login) - removes user with given login\n");
             }
             else
             {
@@ -359,11 +423,25 @@ public class Console
         }
         else if(outcome == 1)
         {
-            System.out.println("Item not found.");
+            System.out.println("You haven't rented any vehicle.");
+        }
+    }
+
+    private void removeUser(String login)
+    {
+        Integer outcome = userRepository.remove(login);
+
+        if(outcome == 0)
+        {
+            System.out.println("User removed.");
+        }
+        else if(outcome == 1)
+        {
+            System.out.println("User not found.");
         }
         else if(outcome == 2)
         {
-            System.out.println("Item has been already returned.");
+            System.out.println("Can't remove user. He/She hasn't returned a vehicle yet.");
         }
     }
 

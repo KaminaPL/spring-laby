@@ -35,4 +35,24 @@ public class Authentication
         System.out.println("User not found.\n");
         return new User(null, null, null, null);
     }
+
+    public Boolean register(String login, String password, String passwordConfirmation)
+    {
+        if(password.compareTo(passwordConfirmation) != 0)
+        {
+            System.out.println("Passwords don't match.\n");
+            return false;
+        }
+
+        Integer outcome = repository.add(new User(login, DigestUtils.sha256Hex(password), "USER", -1));
+
+        if(outcome == 0)
+        {
+            System.out.println("Successfully registered.");
+            return true;
+        }
+
+        System.out.println("User already exists.");
+        return false;
+    }
 }

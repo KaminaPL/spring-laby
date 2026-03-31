@@ -46,6 +46,42 @@ public class UserRepositoryImpl implements IUserRepository
     }
 
     @Override
+    public Integer add(User user)
+    {
+        for(User u : userList)
+        {
+            if(u.getLogin().compareTo(user.getLogin()) == 0)
+            {
+                return 1;
+            }
+        }
+
+        userList.add(user.deepCopy());
+        return 0;
+    }
+
+    @Override
+    public Integer remove(String login)
+    {
+        for(User u : userList)
+        {
+            if(u.getLogin().compareTo(login) == 0)
+            {
+                if(u.getRentedVehicleId() > -1)
+                {
+                    return 2;
+                }
+                else
+                {
+                    userList.remove(u);
+                    return 0;
+                }
+            }
+        }
+
+        return 1;
+    }
+
     public void save()
     {
         try
@@ -67,7 +103,6 @@ public class UserRepositoryImpl implements IUserRepository
         }
     }
 
-    @Override
     public void load()
     {
         try

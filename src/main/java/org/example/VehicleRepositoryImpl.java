@@ -120,7 +120,6 @@ public class VehicleRepositoryImpl implements IVehicleRepository
         return 1;
     }
 
-    @Override
     public void load()
     {
         try
@@ -180,7 +179,6 @@ public class VehicleRepositoryImpl implements IVehicleRepository
         }
     }
 
-    @Override
     public void save()
     {
         try

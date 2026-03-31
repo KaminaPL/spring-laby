@@ -8,9 +8,9 @@ public interface IUserRepository
 
    List<User> getUsers();
 
-   void save();
+   Integer add(User user);
 
-   void load();
+   Integer remove(String login);
 
    void update(User user);
 }

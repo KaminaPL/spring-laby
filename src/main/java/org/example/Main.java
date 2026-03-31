@@ -8,29 +8,17 @@ public class Main
 {
     public static void main(String[] args)
     {
-        Authentication auth = new Authentication();
-        User user;
+        Console console = new Console();
         Scanner sc = new Scanner(System.in);
-
-        while(true)
-        {
-            user = auth.authenticate(sc.nextLine(), sc.nextLine());
-
-            if(user.getLogin() != null)
-            {
-                break;
-            }
-        }
-
-        Console console = new Console(user);
         String command;
-
-        System.out.println("Hello " + user.getLogin() + "!\n");
 
         while(console.getStatus() == Console.Status.ONGOING)
         {
             command = sc.nextLine();
-            console.readCommand(command.split(" "));
+            if(!command.isEmpty())
+            {
+                console.readCommand(command.split(" "));
+            }
         }
     }
 }
