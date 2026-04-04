@@ -10,7 +10,7 @@ class VehicleRepositoryTest
 {
     @Test
     void getVehiclesShouldReturnDeepCopy() {
-        IVehicleRepository repo = new VehicleRepositoryImpl("/home/bartosz/vehicles.csv");
+        VehicleRepository repo = new VehicleJsonRepository("/home/bartosz/vehicles.csv");
         List<Vehicle> vehicles1 = repo.getVehicles();
         List<Vehicle> vehicles2  = repo.getVehicles();
         assertNotSame(vehicles1, vehicles2);
@@ -19,7 +19,7 @@ class VehicleRepositoryTest
 
     @Test
     void addingToReturnedListShouldNotChangeRepository() {
-        IVehicleRepository repo = new VehicleRepositoryImpl("/home/bartosz/vehicles.csv");
+        VehicleRepository repo = new VehicleJsonRepository("/home/bartosz/vehicles.csv");
         List<Vehicle> vehicles = repo.getVehicles();
         int repoSizeBefore = repo.getVehicles().size();
         vehicles.add(new Car(100, "Test", "Test", 2026, 1, false));
@@ -29,7 +29,7 @@ class VehicleRepositoryTest
 
     @Test
     void changingReturnedVehicleShouldNotChangeRepository() {
-        IVehicleRepository repo = new VehicleRepositoryImpl("/home/bartosz/vehicles.csv");
+        VehicleRepository repo = new VehicleJsonRepository("/home/bartosz/vehicles.csv");
         List<Vehicle> vehicles = repo.getVehicles();
         Vehicle copy = vehicles.get(0);
         boolean rented = repo.getVehicles().get(0).isRented();

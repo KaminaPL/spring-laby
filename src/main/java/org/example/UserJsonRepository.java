@@ -3,140 +3,70 @@ package org.example;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-public class UserRepository implements IUserRepository
+public class UserJsonRepository implements UserRepository
 {
+    private JsonFileStorage<User> repository;
     private List<User> userList;
-    private String csvFilePath;
+    private String filename;
 
 
-    public UserRepository(String csvFilePath)
+    public UserJsonRepository(String filename)
     {
-        this.csvFilePath = csvFilePath;
-        userList = new ArrayList<>();
-        load();
+        this.filename = filename;
+        repository = new JsonFileStorage<>(filename, User.class);
+        userList = repository.load();
     }
 
 
     @Override
-    public User getUser(String login)
+    public Optional<User> getUser(String login)
     {
-        for(User user : userList)
+        User user = null;
+
+        try
         {
-            if(user.getLogin().compareTo(login) == 0)
-            {
-                return user.copy();
-            }
+            user = userList.stream().filter(it -> it.getLogin().compareTo(login) == 0).toList().getFirst();
+        }
+        catch (NoSuchElementException e)
+        {
+            e.printStackTrace();
         }
 
-        return new User(null, null, null, null);
+        return Optional.ofNullable(user);
     }
 
     @Override
     public List<User> getUsers()
     {
-        List<User> copiedUserList = new ArrayList<>();
-
-        for(User user : userList)
-        {
-            copiedUserList.add(user.copy());
-        }
-
-        return copiedUserList;
+        return userList.stream().map(it -> it.copy()).toList();
     }
 
     @Override
-    public Integer add(User user)
+    public void addUser(User user)
     {
-        for(User u : userList)
-        {
-            if(u.getLogin().compareTo(user.getLogin()) == 0)
-            {
-                return 1;
-            }
-        }
-
-        userList.add(user.copy());
-        return 0;
+        userList.add(user);
     }
 
     @Override
-    public Integer remove(String login)
+    public void removeUserById(String id)
     {
-        for(User u : userList)
-        {
-            if(u.getLogin().compareTo(login) == 0)
-            {
-                if(u.getRentedVehicleId() > -1)
-                {
-                    return 2;
-                }
-                else
-                {
-                    userList.remove(u);
-                    return 0;
-                }
-            }
-        }
-
-        return 1;
-    }
-
-    public void save()
-    {
-        try
-        {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(csvFilePath));
-            StringBuilder sb = new StringBuilder();
-
-            for(User user : userList)
-            {
-                sb.append(user.toCSV());
-            }
-
-            bw.write(sb.toString());
-            bw.close();
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    public void load()
-    {
-        try
-        {
-            BufferedReader br = new BufferedReader(new FileReader(csvFilePath));
-            String line;
-
-            while((line = br.readLine()) != null)
-            {
-                String[] data = line.split(";");
-
-                userList.add(new User(data[0], data[1], data[2], Integer.parseInt(data[3])));
-            }
-
-            br.close();
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
+        userList = userList.stream().filter(it -> it.getId().compareTo(id) == 0).toList();
     }
 
     @Override
-    public void update(User user)
+    public void removeUserByLogin(String login)
     {
-        for(User u : userList)
-        {
-            if(u.getLogin().compareTo(user.getLogin()) == 0)
-            {
-                userList.remove(u);
-                break;
-            }
-        }
+        userList = userList.stream().filter(it -> it.getLogin().compareTo(login) == 0).toList();
+    }
 
+    @Override
+    public void updateUser(User user)
+    {
+        userList = userList.stream().filter(it -> it.getLogin().compareTo(user.getLogin()) == 0).toList();
         userList.add(user.copy());
     }
 }

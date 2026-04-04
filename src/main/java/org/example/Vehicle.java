@@ -1,109 +1,51 @@
 package org.example;
 
-public abstract class Vehicle
+import lombok.*;
+
+import java.util.Map;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@EqualsAndHashCode(of="id")
+@ToString
+public class Vehicle
 {
-    private String brand, model;
-    private Integer year, price, id;
-    private Boolean isRented;
+    private String id;
+    private String category;
+    private String brand;
+    private String model;
+    private int year;
+    private double price;
+    private Map<String, Object> attributes;
 
-    public Vehicle(Integer id, String brand, String model, Integer year, Integer price, Boolean isRented)
+    Object getAttribute(String key)
     {
-        this.id = id;
-        this.brand = brand;
-        this.model = model;
-        this.year = year;
-        this.price = price;
-        this.isRented = isRented;
+        return attributes.get(key);
     }
 
-    public Vehicle(Vehicle vehicle)
+    void removeAttribute(String key)
     {
-        this.id = vehicle.id;
-        this.brand = vehicle.brand;
-        this.model = vehicle.model;
-        this.year = vehicle.year;
-        this.price = vehicle.price;
-        this.isRented = vehicle.isRented;
+        attributes.remove(key);
     }
 
-
-    public abstract String toString();
-
-    public abstract Vehicle deepCopy();
-
-    public Integer getId()
+    void addAttribute(String key, Object value)
     {
-        return id;
+        attributes.put(key, value);
     }
 
-    public void setId(Integer id)
+    public Vehicle copy()
     {
-        this.id = id;
-    }
-
-    public String getBrand()
-    {
-        return brand;
-    }
-
-    public void setBrand(String brand)
-    {
-        this.brand = brand;
-    }
-
-    public String getModel()
-    {
-        return model;
-    }
-
-    public void setModel(String model)
-    {
-        this.model = model;
-    }
-
-    public Integer getYear()
-    {
-        return year;
-    }
-
-    public void setYear(Integer year)
-    {
-        this.year = year;
-    }
-
-    public Integer getPrice()
-    {
-        return price;
-    }
-
-    public void setPrice(Integer price)
-    {
-        this.price = price;
-    }
-
-    public Boolean isRented()
-    {
-        return isRented;
-    }
-
-    public Boolean isNotRented() { return !isRented; }
-
-    public void setRented(Boolean value)
-    {
-        isRented = value;
-    }
-
-    public String toCSV()
-    {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(id.toString() + ';')
-                .append(brand + ';')
-                .append(model + ';')
-                .append(year.toString() + ';')
-                .append(price.toString() + ';')
-                .append(isRented.toString() + ';');
-
-        return sb.toString();
+        return Vehicle.builder()
+                .id(id)
+                .category(category)
+                .brand(brand)
+                .model(model)
+                .year(year)
+                .price(price)
+                .attributes(attributes)
+                .build();
     }
 }

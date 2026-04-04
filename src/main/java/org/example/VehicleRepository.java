@@ -1,19 +1,15 @@
 package org.example;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface VehcicleRepository
+public interface VehicleRepository
 {
-    void add(Vehicle vehicle);
+    void addVehicle(Vehicle vehicle);
 
-    Integer remove(Integer id);
+    void removeVehicle(String id);
 
-    Vehicle getVehicle(Integer id);
-
-    Integer rentVehicle(Integer id);
-
-    Integer returnVehicle(Integer id);
+    Optional<Vehicle> getVehicle(String id);
 
     List<Vehicle> getVehicles();
-
 }

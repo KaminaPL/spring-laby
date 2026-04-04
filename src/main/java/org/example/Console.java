@@ -1,6 +1,8 @@
 package org.example;
 
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 public class Console
 {
@@ -9,29 +11,21 @@ public class Console
         ONGOING, TERMINATED
     }
 
+    @Setter
+    @Getter
     private Status status;
     private User user;
-    private VehicleRepositoryImpl vehicleRepository;
-    private UserRepositoryImpl userRepository;
-    private Authentication auth;
+    private VehicleJsonRepository vehicleRepository;
+    private UserJsonRepository userRepository;
+    private AuthService auth;
 
 
     public Console()
     {
         status = Status.ONGOING;
-        auth = new Authentication();
+        auth = new AuthService();
     }
 
-
-    public void setCurrentStatus(Status status)
-    {
-        this.status = status;
-    }
-
-    public Status getStatus()
-    {
-        return status;
-    }
 
     public void readCommand(String[] args)
     {
@@ -89,8 +83,8 @@ public class Console
         {
             if(args[0].compareTo("open") == 0)
             {
-                userRepository = new UserRepositoryImpl("/home/bartosz/users.csv");
-                vehicleRepository = new VehicleRepositoryImpl("/home/bartosz/vehicles.csv");
+                userRepository = new UserJsonRepository("/home/bartosz/users.csv");
+                vehicleRepository = new VehicleJsonRepository("/home/bartosz/vehicles.csv");
                 System.out.println("Successfully connected to repository.");
             }
             else
@@ -109,7 +103,7 @@ public class Console
             {
                 vehicleRepository.save();
                 userRepository.save();
-                setCurrentStatus(Status.TERMINATED);
+                setStatus(Status.TERMINATED);
             }
             else if(args[0].compareTo("list") == 0)
             {
@@ -162,7 +156,7 @@ public class Console
             {
                 vehicleRepository.save();
                 userRepository.save();
-                setCurrentStatus(Status.TERMINATED);
+                setStatus(Status.TERMINATED);
             }
             else if(args[0].compareTo("list") == 0)
             {
@@ -182,11 +176,7 @@ public class Console
                 {
                     System.out.println("Too few arguments.");
                 }
-                else if(args[1].compareTo("MOTORCYCLE") == 0 && args.length < 7)
-                {
-                    System.out.println("Too few arguments.");
-                }
-                else if(args.length > 7)
+                else if(args.length > 6)
                 {
                     System.out.println("Too many arguments.");
                 }
@@ -246,7 +236,7 @@ public class Console
 
     private void addItem(String[] data)
     {
-        Integer year, price;
+        int year, price;
 
         try
         {
@@ -268,41 +258,21 @@ public class Console
             return;
         }
 
-        if(data[1].compareTo("CAR") == 0)
-        {
-            vehicleRepository.add(new Car(
-                    -1,
-                    data[2],
-                    data[3],
-                    year,
-                    price,
-                    false
-            ));
-        }
-        else if(data[1].compareTo("MOTORCYCLE") == 0)
-        {
-            vehicleRepository.add(new Motorcycle(
-                    -1,
-                    data[2],
-                    data[3],
-                    year,
-                    price,
-                    false,
-                    data[6]
-            ));
-        }
-        else
-        {
-            System.out.println("Invalid vehicle type `" + data[1] +"`.");
-            return;
-        }
+        vehicleRepository.add(new Vehicle(
+                -1,
+                data[2],
+                data[3],
+                year,
+                price,
+                false
+        ));
 
         System.out.println("Successfully added vehicle to repository. Results will be saved after the end of session.");
     }
 
     private void removeItem(String id)
     {
-        Integer convertedId;
+        int convertedId;
 
         try
         {
@@ -314,7 +284,7 @@ public class Console
             return;
         }
 
-        Integer outcome = vehicleRepository.remove(convertedId);
+        int outcome = vehicleRepository.remove(convertedId);
 
         if(outcome == 0)
         {
@@ -343,7 +313,7 @@ public class Console
                     StringBuilder sb = new StringBuilder();
 
 
-                    for(int i=1;i<6;++i)
+                    for(int i=0;i<5;++i)
                     {
                         sb.append(data[i] + " ");
                     }
@@ -369,7 +339,7 @@ public class Console
 
     private void rentItem(String id)
     {
-        Integer convertedId;
+        int convertedId;
 
         try
         {
@@ -381,7 +351,7 @@ public class Console
             return;
         }
 
-        Integer outcome = vehicleRepository.rentVehicle(convertedId);
+        int outcome = vehicleRepository.rentVehicle(convertedId);
 
         if(outcome == 0)
         {
@@ -401,7 +371,7 @@ public class Console
 
     private void returnItem(String id)
     {
-        Integer convertedId;
+        int convertedId;
 
         try
         {
@@ -413,7 +383,7 @@ public class Console
             return;
         }
 
-        Integer outcome = vehicleRepository.returnVehicle(convertedId);
+        int outcome = vehicleRepository.returnVehicle(convertedId);
 
         if(outcome == 0)
         {
@@ -429,7 +399,7 @@ public class Console
 
     private void removeUser(String login)
     {
-        Integer outcome = userRepository.remove(login);
+        int outcome = userRepository.remove(login);
 
         if(outcome == 0)
         {

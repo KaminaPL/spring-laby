@@ -1,16 +1,19 @@
 package org.example;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface IUserRepository
+public interface UserRepository
 {
-   User getUser(String login);
+   Optional<User> getUser(String login);
 
    List<User> getUsers();
 
-   Integer add(User user);
+   void addUser(User user);
 
-   Integer remove(String login);
+   void removeUserById(String id);
 
-   void update(User user);
+   void removeUserByLogin(String login);
+
+   void updateUser(User user);
 }

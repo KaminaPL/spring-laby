@@ -2,14 +2,16 @@ package org.example;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.util.Optional;
+
 public class AuthService
 {
-    private UserRepository repository;
+    private UserJsonRepository repository;
 
 
     public AuthService()
     {
-        repository = new UserRepository("/home/bartosz/users.csv");
+        repository = new UserJsonRepository("/home/bartosz/users.csv");
     }
 
     public User authenticate(String login, String password)
@@ -17,10 +19,9 @@ public class AuthService
         String hashedPassword = DigestUtils.sha256Hex(password);
         User user = repository.getUser(login);
 
-
         if(user.getLogin() != null)
         {
-            if(hashedPassword.compareTo(user.getPassword()) == 0)
+            if(hashedPassword.compareTo(user.getHashedPassword()) == 0)
             {
                 return user;
             }
@@ -29,14 +30,13 @@ public class AuthService
                 System.out.println("Incorrect password.\n");
                 return new User(null, null, null, null);
             }
-
         }
 
         System.out.println("User not found.\n");
         return new User(null, null, null, null);
     }
 
-    public Boolean register(String login, String password, String passwordConfirmation)
+    public boolean register(String login, String password, String passwordConfirmation)
     {
         if(password.compareTo(passwordConfirmation) != 0)
         {
@@ -44,7 +44,7 @@ public class AuthService
             return false;
         }
 
-        Integer outcome = repository.add(new User(login, DigestUtils.sha256Hex(password), "USER", -1));
+        int outcome = repository.add(new User(login, DigestUtils.sha256Hex(password), "USER", -1));
 
         if(outcome == 0)
         {

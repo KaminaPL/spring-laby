@@ -12,7 +12,7 @@ public class UserRepositoryTest
     @Test
     void getUsersShouldReturnDeepCopy()
     {
-        IUserRepository repo = new UserRepositoryImpl("/home/bartosz/users.csv");
+        UserRepository repo = new UserJsonRepository("/home/bartosz/users.csv");
         List<User> users1 = repo.getUsers();
         List<User> users2  = repo.getUsers();
         assertNotSame(users1, users2);
@@ -22,7 +22,7 @@ public class UserRepositoryTest
     @Test
     void addingToReturnedListShouldNotChangeRepository()
     {
-        IUserRepository repo = new UserRepositoryImpl("/home/bartosz/users.csv");
+        UserRepository repo = new UserJsonRepository("/home/bartosz/users.csv");
         List<User> users = repo.getUsers();
         int repoSizeBefore = repo.getUsers().size();
         users.add(new User("User", "user123", "USER", -1));
@@ -33,7 +33,7 @@ public class UserRepositoryTest
     @Test
     void changingReturnedUserShouldNotChangeRepository()
     {
-        IUserRepository repo = new UserRepositoryImpl("/home/bartosz/users.csv");
+        UserRepository repo = new UserJsonRepository("/home/bartosz/users.csv");
         List<User> users = repo.getUsers();
         User copy = users.get(0);
         copy.setRentedVehicleId(1);
