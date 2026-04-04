@@ -4,13 +4,13 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserRepositoryImpl implements IUserRepository
+public class UserRepository implements IUserRepository
 {
     private List<User> userList;
     private String csvFilePath;
 
 
-    public UserRepositoryImpl(String csvFilePath)
+    public UserRepository(String csvFilePath)
     {
         this.csvFilePath = csvFilePath;
         userList = new ArrayList<>();
@@ -25,7 +25,7 @@ public class UserRepositoryImpl implements IUserRepository
         {
             if(user.getLogin().compareTo(login) == 0)
             {
-                return user.deepCopy();
+                return user.copy();
             }
         }
 
@@ -39,7 +39,7 @@ public class UserRepositoryImpl implements IUserRepository
 
         for(User user : userList)
         {
-            copiedUserList.add(user.deepCopy());
+            copiedUserList.add(user.copy());
         }
 
         return copiedUserList;
@@ -56,7 +56,7 @@ public class UserRepositoryImpl implements IUserRepository
             }
         }
 
-        userList.add(user.deepCopy());
+        userList.add(user.copy());
         return 0;
     }
 
@@ -137,6 +137,6 @@ public class UserRepositoryImpl implements IUserRepository
             }
         }
 
-        userList.add(user.deepCopy());
+        userList.add(user.copy());
     }
 }

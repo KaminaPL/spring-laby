@@ -2,7 +2,7 @@ package org.example;
 
 import java.util.List;
 
-public interface IVehicleRepository
+public interface VehcicleRepository
 {
     void add(Vehicle vehicle);
 

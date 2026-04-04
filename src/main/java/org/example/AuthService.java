@@ -2,14 +2,14 @@ package org.example;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
-public class Authentication
+public class AuthService
 {
-    private UserRepositoryImpl repository;
+    private UserRepository repository;
 
 
-    public Authentication()
+    public AuthService()
     {
-        repository = new UserRepositoryImpl("/home/bartosz/users.csv");
+        repository = new UserRepository("/home/bartosz/users.csv");
     }
 
     public User authenticate(String login, String password)

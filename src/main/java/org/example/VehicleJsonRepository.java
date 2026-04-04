@@ -4,14 +4,14 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VehicleRepositoryImpl implements IVehicleRepository
+public class VehicleRepository implements IVehicleRepository
 {
     private List<Vehicle> vehicleList;
     private String csvFilePath;
     private Integer latestVehicleId;
 
 
-    public VehicleRepositoryImpl(String csvFilePath)
+    public VehicleRepository(String csvFilePath)
     {
         this.csvFilePath = csvFilePath;
         vehicleList = new ArrayList<>();
@@ -32,7 +32,7 @@ public class VehicleRepositoryImpl implements IVehicleRepository
                 }
                 else
                 {
-                    vehicleList.get(i).setRented(true);
+                    vehicleList.get(i).setIsRented(true);
                     return 0;
                 }
             }
@@ -54,7 +54,7 @@ public class VehicleRepositoryImpl implements IVehicleRepository
                 }
                 else
                 {
-                    vehicleList.get(i).setRented(false);
+                    vehicleList.get(i).setIsRented(false);
                     return 0;
                 }
             }
@@ -70,11 +70,11 @@ public class VehicleRepositoryImpl implements IVehicleRepository
         {
             if(vehicleList.get(i).getId().equals(id))
             {
-                return vehicleList.get(i).deepCopy();
+                return vehicleList.get(i).copy();
             }
         }
 
-        return new Car(-1, "", "", 0, 0, false);
+        return new Vehicle(-1, "", "", 0, 0, false);
     }
 
     @Override
@@ -84,7 +84,7 @@ public class VehicleRepositoryImpl implements IVehicleRepository
 
         for(Vehicle vehicle : vehicleList)
         {
-            copiedVehicleList.add(vehicle.deepCopy());
+            copiedVehicleList.add(vehicle.copy());
         }
 
         return copiedVehicleList;
@@ -95,7 +95,7 @@ public class VehicleRepositoryImpl implements IVehicleRepository
     {
         latestVehicleId += 1;
         vehicle.setId(latestVehicleId);
-        vehicleList.add(vehicle.deepCopy());
+        vehicleList.add(vehicle.copy());
     }
 
     @Override
@@ -130,33 +130,16 @@ public class VehicleRepositoryImpl implements IVehicleRepository
             while((line = br.readLine()) != null)
             {
                 String[] data = line.split(";");
-                int dataType = Integer.parseInt(data[0], 2);
 
-                if(dataType == 0)
-                {
-                    vehicleList.add(new Car(
-                            Integer.parseInt(data[1]),
-                            data[2],
-                            data[3],
-                            Integer.parseInt(data[4]),
-                            Integer.parseInt(data[5]),
-                            Boolean.parseBoolean(data[6])
-                            )
-                    );
-                }
-                else if(dataType == 1)
-                {
-                    vehicleList.add(new Motorcycle(
-                            Integer.parseInt(data[1]),
-                            data[2],
-                            data[3],
-                            Integer.parseInt(data[4]),
-                            Integer.parseInt(data[5]),
-                            Boolean.parseBoolean(data[6]),
-                            data[7]
-                            )
-                    );
-                }
+                vehicleList.add(new Vehicle(
+                                Integer.parseInt(data[0]),
+                                data[1],
+                                data[2],
+                                Integer.parseInt(data[3]),
+                                Integer.parseInt(data[4]),
+                                Boolean.parseBoolean(data[5])
+                        )
+                );
             }
 
             br.close();
