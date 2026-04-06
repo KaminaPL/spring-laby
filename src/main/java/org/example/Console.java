@@ -111,6 +111,10 @@ public class Console
                 userRepository.save();
                 setCurrentStatus(Status.TERMINATED);
             }
+            else if(args[0].compareTo("open") == 0)
+            {
+                System.out.println("Repository has been already opened.");
+            }
             else if(args[0].compareTo("list") == 0)
             {
                 showItems();
@@ -145,7 +149,7 @@ public class Console
             {
                 System.out.println("Commands:");
                 System.out.println("leave - close program\nopen - connect to repository\nwhoami - display your data");
-                System.out.println("rent (id) - rent vehicle with given id\nreturn (id) - return vehicle with given id\n");
+                System.out.println("rent (id) - rent vehicle with given id\nreturn - return vehicle\n");
             }
             else if(args[0].compareTo("whoami") == 0)
             {
@@ -163,6 +167,10 @@ public class Console
                 vehicleRepository.save();
                 userRepository.save();
                 setCurrentStatus(Status.TERMINATED);
+            }
+            else if(args[0].compareTo("open") == 0)
+            {
+                System.out.println("Repository has been already opened.");
             }
             else if(args[0].compareTo("list") == 0)
             {
@@ -232,7 +240,7 @@ public class Console
                 System.out.println("list - list all items from repository\nusers - list all users");
                 System.out.println("vadd (type) (brand) (model) (year) (price) when vehicle is motorcycle: (license category) - adds vehicle with given data");
                 System.out.println("example: add CAR Volkswagen T-Roc 2020 15000\n");
-                System.out.println("vremove (id) - removes vehicle with given id\n");
+                System.out.println("vremove (id) - removes vehicle with given id");
                 System.out.println("uremove (login) - removes user with given login\n");
             }
             else
