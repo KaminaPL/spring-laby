@@ -1,6 +1,8 @@
-package org.example;
+package org.example.repositories;
 
 import com.google.gson.reflect.TypeToken;
+import org.example.db.JsonFileStorage;
+import org.example.models.Rental;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +23,7 @@ public class RentalJsonRepository implements RentalRepository
     @Override
     public List<Rental> getAll()
     {
-        return rentalList.stream().map(r -> r.copy()).toList();
+        return rentalList.stream().map(Rental::copy).toList();
     }
 
     @Override
@@ -30,7 +32,7 @@ public class RentalJsonRepository implements RentalRepository
         Rental rental = null;
         try
         {
-            rental = rentalList.stream().filter(r -> r.getId().compareTo(id) == 0).toList().getFirst().copy();
+            rental = rentalList.stream().filter(r -> r.getId().equals(id)).toList().getFirst().copy();
         }
         catch(NoSuchElementException e)
         {
@@ -45,7 +47,7 @@ public class RentalJsonRepository implements RentalRepository
         Rental rental = null;
         try
         {
-            rental = rentalList.stream().filter(r -> r.getVehicleId().compareTo(id) == 0).toList().getFirst().copy();
+            rental = rentalList.stream().filter(r -> r.getVehicleId().equals(id)).toList().getFirst().copy();
         }
         catch(NoSuchElementException e)
         {
@@ -60,7 +62,7 @@ public class RentalJsonRepository implements RentalRepository
         Rental rental = null;
         try
         {
-            rental = rentalList.stream().filter(r -> r.getId().compareTo(id) == 0 && r.isActive()).toList().getFirst().copy();
+            rental = rentalList.stream().filter(r -> r.getId().equals(id) && r.isActive()).toList().getFirst().copy();
         }
         catch(NoSuchElementException e)
         {

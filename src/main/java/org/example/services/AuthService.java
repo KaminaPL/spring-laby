@@ -1,6 +1,7 @@
-package org.example;
+package org.example.services;
 
-import org.apache.commons.codec.digest.DigestUtils;
+import org.example.models.User;
+import org.example.repositories.UserJsonRepository;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Optional;
@@ -25,20 +26,19 @@ public class AuthService
                 return user;
             }
         }
-        return null;
+        return Optional.empty();
     }
 
-    public boolean register(String login, String password, String passwordConfirmation)
+    public void register(String login, String password, String passwordConfirmation)
     {
         if(password.compareTo(passwordConfirmation) != 0)
         {
-            return false;
+            throw new IllegalStateException("Register failed: passwords don't match");
         }
-        if(repository.findByLogin(login).isEmpty())
+        else if(repository.findByLogin(login).isEmpty())
         {
             repository.add(new User(UUID.randomUUID().toString(), login, BCrypt.hashpw(password, BCrypt.gensalt()), "user"));
-            return true;
+            repository.save();
         }
-        return false;
     }
 }

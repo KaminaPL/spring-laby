@@ -1,4 +1,6 @@
-package org.example;
+package org.example.repositories;
+
+import org.example.models.Vehicle;
 
 import java.util.List;
 import java.util.Optional;

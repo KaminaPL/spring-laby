@@ -1,4 +1,13 @@
 package org.example.repositories;
 
-public interface VehicleCategoryConfigRepository {
+import org.example.models.VehicleCategoryConfig;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface VehicleCategoryConfigRepository
+{
+    List<VehicleCategoryConfig> getAll();
+
+    Optional<VehicleCategoryConfig> findByCategory(String category);
 }

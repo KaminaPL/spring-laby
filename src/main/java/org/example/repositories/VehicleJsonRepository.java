@@ -1,6 +1,8 @@
-package org.example;
+package org.example.repositories;
 
 import com.google.gson.reflect.TypeToken;
+import org.example.db.JsonFileStorage;
+import org.example.models.Vehicle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +23,7 @@ public class VehicleJsonRepository implements VehicleRepository
     @Override
     public List<Vehicle> getAll()
     {
-        return vehicleList.stream().map(v -> v.copy()).toList();
+        return vehicleList.stream().map(Vehicle::copy).toList();
     }
 
     @Override
@@ -30,7 +32,7 @@ public class VehicleJsonRepository implements VehicleRepository
         Vehicle vehicle = null;
         try
         {
-            vehicle = vehicleList.stream().filter(v -> v.getId().compareTo(id) == 0).toList().getFirst().copy();
+            vehicle = vehicleList.stream().filter(v -> v.getId().equals(id)).toList().getFirst().copy();
         }
         catch (NoSuchElementException e)
         {
@@ -50,7 +52,7 @@ public class VehicleJsonRepository implements VehicleRepository
     @Override
     public void removeById(String id)
     {
-        vehicleList = vehicleList.stream().filter(v -> v.getId().compareTo(id) != 0).toList();
+        vehicleList = vehicleList.stream().filter(v -> v.getId().equals(id)).toList();
     }
 
     @Override

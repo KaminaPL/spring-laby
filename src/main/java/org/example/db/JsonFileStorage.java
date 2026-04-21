@@ -1,4 +1,4 @@
-package org.example.repositories;
+package org.example.db;
 
 import com.google.gson.Gson;
 

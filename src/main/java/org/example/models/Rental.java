@@ -1,4 +1,4 @@
-package org.example.records;
+package org.example.models;
 import lombok.*;
 
 @Getter

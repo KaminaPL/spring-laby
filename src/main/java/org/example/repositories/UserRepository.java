@@ -1,4 +1,6 @@
-package org.example;
+package org.example.repositories;
+
+import org.example.models.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,8 +12,6 @@ public interface UserRepository
    List<User> getAll();
 
    void add(User user);
-
-   void removeById(String id);
 
    void removeByLogin(String login);
 

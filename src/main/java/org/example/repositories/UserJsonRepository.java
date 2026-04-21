@@ -1,6 +1,8 @@
-package org.example;
+package org.example.repositories;
 
 import com.google.gson.reflect.TypeToken;
+import org.example.db.JsonFileStorage;
+import org.example.models.User;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -26,16 +28,16 @@ public class UserJsonRepository implements UserRepository
     @Override
     public Optional<User> findByLogin(String login)
     {
-        User user = null;
         try
         {
-            user = userList.stream().filter(u -> u.getLogin().compareTo(login) == 0).toList().getFirst();
+            User user = userList.stream().filter(u -> u.getLogin().equals(login)).toList().getFirst();
+            return Optional.of(user.copy());
         }
-        catch (NoSuchElementException e)
+        catch(NoSuchElementException e)
         {
-            e.printStackTrace();
+           e.printStackTrace();
         }
-        return Optional.ofNullable(user);
+        return Optional.empty();
     }
 
     @Override
@@ -45,21 +47,15 @@ public class UserJsonRepository implements UserRepository
     }
 
     @Override
-    public void removeById(String id)
-    {
-        userList = userList.stream().filter(u -> u.getId().compareTo(id) == 0).toList();
-    }
-
-    @Override
     public void removeByLogin(String login)
     {
-        userList = userList.stream().filter(u -> u.getLogin().compareTo(login) == 0).toList();
+        userList = userList.stream().filter(u -> !u.getLogin().equals(login)).toList();
     }
 
     @Override
     public void update(User user)
     {
-        userList = userList.stream().filter(u -> u.getLogin().compareTo(user.getLogin()) == 0).toList();
+        userList = userList.stream().filter(u -> !u.getLogin().equals(user.getLogin())).toList();
         userList.add(user.copy());
     }
 
