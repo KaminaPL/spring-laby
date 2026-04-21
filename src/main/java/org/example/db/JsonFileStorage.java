@@ -1,4 +1,4 @@
-package org.example;
+package org.example.repositories;
 
 import com.google.gson.Gson;
 
@@ -10,7 +10,6 @@ import java.util.List;
 
 public class JsonFileStorage<T>
 {
-
     private final Gson gson = new Gson();
     private final Path path;
     private final Type type;
@@ -23,14 +22,14 @@ public class JsonFileStorage<T>
 
     public List<T> load()
     {
-        if (!Files.exists(path)) return new ArrayList<>();
+        if(!Files.exists(path)) return new ArrayList<>();
         try
         {
             String json = Files.readString(path);
             List<T> list = gson.fromJson(json, type);
             return list != null ? list : new ArrayList<>();
         }
-        catch (IOException e)
+        catch(IOException e)
         {
             e.printStackTrace();
             return new ArrayList<>();
@@ -44,7 +43,7 @@ public class JsonFileStorage<T>
             String json = gson.toJson(data);
             Files.writeString(path, json, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         }
-        catch (IOException e)
+        catch(IOException e)
         {
             e.printStackTrace();
         }

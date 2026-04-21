@@ -1,4 +1,4 @@
-package org.example;
+package org.example.records;
 
 import lombok.*;
 
@@ -7,24 +7,19 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@EqualsAndHashCode(of="login")
+@EqualsAndHashCode(of="id")
 @ToString
 public class User
 {
-    public enum Role
-    {
-        USER,
-        ADMIN
-    }
-
     private String id;
     private String login;
     private String password;
-    private Role role;
+    private String role;
 
     public User copy()
     {
         return User.builder()
+                .id(id)
                 .login(login)
                 .password(password)
                 .role(role)

@@ -9,9 +9,14 @@ public interface RentalRepository
 
     Optional<Rental> findById(String id);
 
-    Rental save(Rental rental);
-
-    void deleteById(String id);
+    Optional<Rental> findByVehicleId(String id);
 
     Optional<Rental> findByIdAndReturnDateIsNull(String id);
+
+    void add(Rental rental);
+
+    void removeById(String id);
+
+    void save();
+
 }
