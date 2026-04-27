@@ -8,13 +8,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-public class VehicleCategoryConfigJsonRepository implements VehicleCategoryConfigRepository
-{
+public class VehicleCategoryConfigJsonRepository implements VehicleCategoryConfigRepository {
+
     private final JsonFileStorage<VehicleCategoryConfig> storage;
     private List<VehicleCategoryConfig> configList;
 
-    public VehicleCategoryConfigJsonRepository(String filename)
-    {
+    public VehicleCategoryConfigJsonRepository(String filename) {
         storage = new JsonFileStorage<>(filename, new TypeToken<List<VehicleCategoryConfig>>() {}.getType());
         configList = storage.load();
     }
@@ -24,15 +23,11 @@ public class VehicleCategoryConfigJsonRepository implements VehicleCategoryConfi
         return configList.stream().map(c -> c.copy()).toList();
     }
 
-    public Optional<VehicleCategoryConfig> findByCategory(String category)
-    {
-        try
-        {
+    public Optional<VehicleCategoryConfig> findByCategory(String category) {
+        try {
             return Optional.ofNullable(configList.stream()
-                    .filter(c -> c.getCategory().compareTo(category) == 0).toList().getFirst().copy());
-        }
-        catch (NoSuchElementException e)
-        {
+                    .filter(c -> c.getCategory().equals(category)).toList().getFirst().copy());
+        } catch (NoSuchElementException e) {
             e.printStackTrace();
         }
         return Optional.empty();

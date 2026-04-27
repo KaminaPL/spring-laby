@@ -10,65 +10,70 @@ import org.example.models.User;
 import org.example.models.Vehicle;
 import org.example.models.VehicleCategoryConfig;
 import org.example.repositories.*;
-import org.example.services.AuthService;
-import org.example.services.VehicleCategoryConfigService;
+import org.example.services.*;
 
-public class Console
-{
-    public enum Status
-    {
-        ONGOING, TERMINATED
+public class Console {
+
+    public enum Status {
+        ONGOING,
+        TERMINATED
     }
 
     @Setter
     @Getter
     private Status status;
-    private User user;
-    private VehicleRepository vehicleRepository;
-    private RentalRepository rentalRepository;
-    private VehicleCategoryConfigService configService;
-    private AuthService auth;
+    private User currentUser;
+    private final VehicleCategoryConfigService configService;
+    private final VehicleService vehicleService;
+    private final RentalService rentalService;
+    private final UserService userService;
+    private final AuthService authService;
 
-    public Console()
-    {
+    public Console() {
         status = Status.ONGOING;
-        vehicleRepository = new VehicleJsonRepository("/home/bartosz/code/projects/java/Lab3/vehicles.json");
-        rentalRepository = new RentalJsonRepository("/home/bartosz/code/projects/java/Lab3/rentals.json");
+        currentUser = null;
         configService =  new VehicleCategoryConfigService(
                 new VehicleCategoryConfigJsonRepository("/home/bartosz/code/projects/java/Lab3/vehicle-configs.json")
         );
-        auth = new AuthService();
+        vehicleService = new VehicleService(
+                new VehicleJsonRepository("/home/bartosz/code/projects/java/Lab3/vehicles.json"),
+                new VehicleValidator(configService)
+        );
+        rentalService = new RentalService(
+                new RentalJsonRepository("/home/bartosz/code/projects/java/Lab3/rentals.json")
+        );
+        userService = new UserService(
+                new UserJsonRepository("/home/bartosz/code/projects/java/Lab3/users.json")
+        );
+        authService = new AuthService(this.userService);
     }
 
-    public void readCommand(String command)
-    {
+    public void readCommand(String command) {
         System.out.print('\n');
-        if(user == null) verifyUser(command);
-        else if(user.getRole().equals("USER")) parseCommandAsUser(command);
+        if(currentUser == null) verifyUser(command);
+        else if(currentUser.getRole().equals("User")) parseCommandAsUser(command);
         else parseCommandAsAdmin(command);
         System.out.print('\n');
     }
 
-    private void verifyUser(String command)
-    {
+    private void verifyUser(String command) {
         Scanner sc = new Scanner(System.in);
-        switch(command)
-        {
-            case "login" ->
-            {
-                String login , password;
+        switch(command) {
+            case "login" -> {
+                String login, password;
                 System.out.print("Login: ");
                 login = sc.nextLine();
                 System.out.print("Password: ");
                 password = sc.nextLine();
-                Optional<User> loggedUser = auth.authenticate(login, password);
-                if(loggedUser.isPresent()) user = loggedUser.get();
-                else System.out.println("Error occurred while trying to log in. Try again.");
+                try {
+                    currentUser = authService.authenticate(login, password);
+                } catch(IllegalArgumentException e) {
+                    e.printStackTrace();
+                    System.out.println("Log in failed, please try again.");
+                }
             }
-            case "register" ->
-            {
-                try
-                {
+            case "register" -> {
+                try {
                     String login, password, passwordConfirmation;
                     System.out.print("Login: ");
                     login = sc.nextLine();
@@ -76,135 +81,142 @@ public class Console
                     password = sc.nextLine();
                     System.out.print("Confirm password: ");
                     passwordConfirmation = sc.nextLine();
-                    auth.register(login, password, passwordConfirmation);
+                    authService.register(login, password, passwordConfirmation);
                     System.out.println("Successfully registered new user! Please Log in now.");
-                }
-                catch(IllegalStateException e)
-                {
+                } catch(IllegalArgumentException e) {
                     e.printStackTrace();
                     System.out.println("Error, passwords don't match.");
                 }
             }
-            case "help" ->
-            {
-                System.out.println("login (name) (password) - sign into your account");
-                System.out.println("register (name) (password) (confirm password) - create new account");
+            case "help" -> {
+                System.out.println("login - sign into your account");
+                System.out.println("register - create new account");
+                System.out.println("leave - exit program");
             }
             default -> System.out.println("Login or create new account first. If you need help type `help`.");
         }
     }
 
-    private void parseCommandAsUser(String command)
-    {
-        Scanner sc = new Scanner(System.in);
-        switch(command)
-        {
+    private void parseCommandAsUser(String command) {
+        switch(command) {
             case "items" -> showNotRentedItems();
-            case "rent" ->
-            {
-                System.out.print("Type id of a rental: ");
-                rentItem(sc.nextLine());
-            }
-            case "return" ->
-            {
-                System.out.print("Type id of a rental: ");
-                returnItem(sc.nextLine());
-            }
+            case "rent" -> rentItem();
+            case "return" -> returnItem();
             case "leave" -> this.setStatus(Status.TERMINATED);
+            case "help" -> {
+                System.out.println("items - list all items");
+                System.out.println("rent - rent an item");
+                System.out.println("return - return an item that you've rented");
+                System.out.println("leave - exit program");
+            }
             default -> System.out.println("Unrecognized command. Please type `help` to get list of commands.");
         }
     }
 
-    private void parseCommandAsAdmin(String command)
-    {
-        Scanner sc = new Scanner(System.in);
-        switch(command)
-        {
+    private void parseCommandAsAdmin(String command) {
+        switch(command) {
             case "items" -> showItems();
             case "add" -> addItem();
-            case "remove" ->
-            {
-                System.out.print("Type id of an item to remove: ");
-                removeItem(sc.nextLine());
-            }
+            case "rmv" -> removeItem();
+            case "rmu" -> removeUser();
             case "leave" -> this.setStatus(Status.TERMINATED);
+            case "help" -> {
+                System.out.println("items - list all items");
+                System.out.println("add - add an item");
+                System.out.println("rmv - remove vehicle");
+                System.out.println("rmu - remove user");
+                System.out.println("leave - exit program");
+            }
             default -> System.out.println("Unrecognized command. Please type `help` to get list of commands.");
         }
     }
 
-    private void showItems()
-    {
-        List<Vehicle> itemList = vehicleRepository.getAll();
-        itemList.forEach(
-                v ->
-        {
-            Optional<Rental> rental = rentalRepository.findByVehicleId(v.getId());
-            System.out.println("id: " + v.getId());
-            if(rental.isPresent()) System.out.println("rented: true");
-            else System.out.println("rented: false");
-            System.out.println("category: " + v.getCategory());
-            System.out.println("brand: " + v.getBrand());
-            System.out.println("model: " + v.getModel());
-            System.out.println("year: " + v.getYear());
-            System.out.println("price: " + v.getPrice());
-            v.getAttributes().forEach((key, value) -> System.out.println(key + ": " + value.toString()));
-            System.out.print("\n\n");
-        });
-    }
-
-    private void showNotRentedItems()
-    {
-        List<Vehicle> itemList = vehicleRepository.getAll();
-        itemList.forEach(v ->
-        {
-            Optional<Rental> rental = rentalRepository.findByVehicleId(v.getId());
-
-            if(rental.isPresent() && rental.get().isActive())
-            {
+    private void showItems() {
+        List<Vehicle> vehicleList = vehicleService.getAll();
+        vehicleList.forEach(v -> {
+            try {
+                Rental rental = rentalService.findByVehicleId(v.getId());
                 System.out.println("id: " + v.getId());
+                if(rental.isActive()) System.out.println("rented: false");
+                else System.out.println("rented: true");
                 System.out.println("category: " + v.getCategory());
                 System.out.println("brand: " + v.getBrand());
                 System.out.println("model: " + v.getModel());
                 System.out.println("year: " + v.getYear());
                 System.out.println("price: " + v.getPrice());
                 v.getAttributes().forEach((key, value) -> System.out.println(key + ": " + value.toString()));
-                System.out.print("\n\n");
+                System.out.print("\n");
+            } catch(IllegalArgumentException e) {
+                e.printStackTrace();
             }
         });
     }
 
-    private void rentItem(String id)
-    {
-        Optional<Rental> foundRental = rentalRepository.findByVehicleId(id);
-        if(foundRental.isPresent() && foundRental.get().isActive())
-        {
-            Rental rental = foundRental.get();
-            rental.setUserId(user.getId());
-            rental.setRentDateTime(LocalDate.now().toString());
-            rental.setReturnDateTime(LocalDate.now().plusMonths(2).toString());
-            rentalRepository.removeById(rental.getId());
-            rentalRepository.add(rental);
-            rentalRepository.save();
+    private void showNotRentedItems() {
+        List<Vehicle> vehicleList = vehicleService.getAll();
+        vehicleList.forEach(v -> {
+            try {
+                Rental rental = rentalService.findByVehicleId(v.getId());
+                if(rental.isActive()) {
+                    System.out.println("id: " + v.getId());
+                    System.out.println("category: " + v.getCategory());
+                    System.out.println("brand: " + v.getBrand());
+                    System.out.println("model: " + v.getModel());
+                    System.out.println("year: " + v.getYear());
+                    System.out.println("price: " + v.getPrice());
+                    v.getAttributes().forEach((key, value) -> System.out.println(key + ": " + value.toString()));
+                    System.out.print("\n\n");
+                }
+            } catch(IllegalArgumentException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void rentItem() {
+        List<Rental> rentals = rentalService.getAll();
+        rentals = rentals.stream().filter(it -> it.getUserId().equals(currentUser.getId())).toList();
+        if(!rentals.isEmpty()) {
+            System.out.println("Can't rent another vehicle. You still haven't returned one.");
+            return;
+        }
+        String id;
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Vehicle id: ");
+        id = sc.nextLine();
+        try {
+            Rental foundRental = rentalService.findByVehicleId(id);
+            if(foundRental.isActive()) {
+                foundRental.setUserId(currentUser.getId());
+                foundRental.setRentDateTime(LocalDate.now().toString());
+                foundRental.setReturnDateTime(LocalDate.now().plusMonths(2).toString());
+                rentalService.removeById(foundRental.getId());
+                rentalService.add(foundRental);
+                rentalService.save();
+            }
+        } catch(IllegalArgumentException e) {
+            e.printStackTrace();
         }
     }
 
-    private void returnItem(String id)
-    {
-        Optional<Rental> foundRental = rentalRepository.findByVehicleId(id);
-        if(foundRental.isPresent() && !foundRental.get().isActive() && foundRental.get().getUserId().compareTo(user.getId()) == 0)
-        {
-            Rental rental = foundRental.get();
+    private void returnItem() {
+        try {
+            List<Rental> rentals = rentalService.getAll();
+            Rental rental = rentals.stream().filter(it -> it.getUserId().equals(currentUser.getId())).toList().getFirst();
             rental.setUserId("");
             rental.setRentDateTime("");
             rental.setReturnDateTime("");
-            rentalRepository.removeById(rental.getId());
-            rentalRepository.add(rental);
-            rentalRepository.save();
+            rentalService.removeById(rental.getId());
+            rentalService.add(rental);
+            rentalService.save();
+            System.out.println("Item returned.");
+        } catch (NoSuchElementException e) {
+            e.printStackTrace();
+            System.out.println("No rented item found.");
         }
     }
 
-    private void addItem()
-    {
+    private void addItem() {
         String category, brand, model, year, price;
         Scanner sc = new Scanner(System.in);
         System.out.print("Category: ");
@@ -222,48 +234,63 @@ public class Console
         Map<String, Object> attributes = new HashMap<>();
         VehicleCategoryConfig config = configService.findByCategory(category);
         Map<String, String> expectedAttributes = config.getAttributes();
-        expectedAttributes.forEach(
-                (key, value) ->
-                {
-                    System.out.print("Enter value for attribute `" + key + "`: ");
-                    switch(value)
-                    {
-                        case "string" -> attributes.put(key, sc.nextLine());
-                        case "number" -> attributes.put(key, sc.nextDouble());
-                        case "boolean" -> attributes.put(key, sc.nextBoolean());
-                        case "integer" -> attributes.put(key, sc.nextInt());
-                    }
-                }
-        );
+        expectedAttributes.forEach((key, value) -> {
+            System.out.print("Enter value for attribute `" + key + "`: ");
+            switch(value) {
+                case "string" -> attributes.put(key, sc.nextLine());
+                case "number" -> attributes.put(key, sc.nextDouble());
+                case "boolean" -> attributes.put(key, sc.nextBoolean());
+                case "integer" -> attributes.put(key, sc.nextInt());
+            }
+        });
         Vehicle vehicle = new Vehicle(vehicleId, category, brand, model, Integer.parseInt(year), Double.parseDouble(price), attributes);
         Rental rental = new Rental(rentalId, vehicleId, "", "", "");
-        try
-        {
-            vehicleRepository.add(vehicle);
-            rentalRepository.add(rental);
-            vehicleRepository.save();
-            rentalRepository.save();
-        }
-        catch(IllegalArgumentException | IllegalStateException e)
-        {
+        try {
+            vehicleService.add(vehicle);
+            rentalService.add(rental);
+            vehicleService.save();
+            rentalService.save();
+        } catch(IllegalArgumentException | IllegalStateException e) {
             e.printStackTrace();
         }
     }
 
-    private void removeItem(String id)
-    {
-        List<Rental> rentals = rentalRepository.getAll();
-        rentals.forEach(
-                r ->
-            {
-                if(r.getVehicleId().equals(id))
-                {
-                    vehicleRepository.removeById(r.getVehicleId());
-                    rentalRepository.removeById(r.getId());
-                    vehicleRepository.save();
-                    rentalRepository.save();
-               }
+    private void removeItem() {
+        String id;
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Vehicle id: ");
+        id = sc.nextLine();
+        try {
+            Rental rental = rentalService.findByVehicleId(id);
+            if(rental.isActive()) {
+                vehicleService.removeById(rental.getVehicleId());
+                rentalService.removeById(rental.getId());
+                vehicleService.save();
+                rentalService.save();
+            } else {
+                System.out.println("Can't remove item, it has not been returned yet.");
             }
-        );
+        } catch(IllegalArgumentException e)
+        {
+            e.printStackTrace();
+            System.out.println("No vehicle found with such id.");
+        }
+    }
+
+    private void removeUser() {
+        String login;
+        Scanner sc = new Scanner(System.in);
+        System.out.print("User login: ");
+        login = sc.nextLine();
+        if(!userService.userExist(login)) {
+            System.out.println("User not found.");
+            return;
+        }
+        User user = userService.findByLogin(login);
+        if(!rentalService.rentalWithUserIdExist(user.getId())) {
+            userService.removeByLogin(login);
+        } else {
+            System.out.println("Cannot remove user. User has not returned a vehicle yet.");
+        }
     }
 }

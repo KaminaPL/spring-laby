@@ -6,41 +6,35 @@ import org.example.repositories.VehicleCategoryConfigJsonRepository;
 import org.example.repositories.VehicleJsonRepository;
 import org.example.repositories.VehicleRepository;
 
-public class VehicleService
-{
-    private final VehicleRepository vehicleRepository;
-    private final VehicleValidator vehicleValidator;
+import java.util.List;
 
-    public VehicleService(String vehiclesRepositoryFilename, String vehicleConfigurationsFilename)
-    {
-        vehicleRepository = new VehicleJsonRepository(vehicleConfigurationsFilename);
-        vehicleValidator = new VehicleValidator(
-                new VehicleCategoryConfigService(
-                        new VehicleCategoryConfigJsonRepository(vehicleConfigurationsFilename)
-                )
-        );
+public class VehicleService {
+
+    private final VehicleRepository repository;
+    private final VehicleValidator validator;
+
+    public VehicleService(VehicleRepository repository, VehicleValidator validator) {
+        this.repository = repository;
+        this.validator = validator;
     }
 
-    public Vehicle findById(String id)
-    {
-        return vehicleRepository.findById(id)
+    public List<Vehicle> getAll() { return repository.getAll(); }
+
+    public Vehicle findById(String id) {
+        return repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No vehicle with such id: " + id));
     }
 
-    public void add(Vehicle vehicle)
-    {
-        try
-        {
-            vehicleValidator.validate(vehicle);
-            vehicleRepository.add(vehicle);
+    public void add(Vehicle vehicle) {
+        try {
+            validator.validate(vehicle);
+            repository.add(vehicle);
         }
-        catch(IllegalStateException e)
-        {
+        catch(IllegalStateException e) {
             e.printStackTrace();
             throw new IllegalStateException("Vehicle is null");
         }
-        catch(IllegalArgumentException e)
-        {
+        catch(IllegalArgumentException e) {
             e.printStackTrace();
             throw new IllegalArgumentException("Vehicle attribute is missing or invalid");
         }
@@ -48,6 +42,8 @@ public class VehicleService
 
     public void removeById(String id)
     {
-        vehicleRepository.removeById(id);
+        repository.removeById(id);
     }
+
+    public void save() { repository.save(); }
 }

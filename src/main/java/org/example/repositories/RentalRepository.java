@@ -13,6 +13,8 @@ public interface RentalRepository
 
     Optional<Rental> findByVehicleId(String id);
 
+    Optional<Rental> findByUserId(String id);
+
     Optional<Rental> findByIdAndReturnDateIsNull(String id);
 
     void add(Rental rental);

@@ -9,13 +9,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-public class RentalJsonRepository implements RentalRepository
-{
+public class RentalJsonRepository implements RentalRepository {
+
     private final JsonFileStorage<Rental> storage;
     private List<Rental> rentalList;
 
-    public RentalJsonRepository(String filename)
-    {
+    public RentalJsonRepository(String filename) {
         storage = new JsonFileStorage<>(filename, new TypeToken<List<Rental>>() {}.getType());
         rentalList = storage.load();
     }
@@ -27,61 +26,58 @@ public class RentalJsonRepository implements RentalRepository
     }
 
     @Override
-    public Optional<Rental> findById(String id)
-    {
-        Rental rental = null;
-        try
-        {
-            rental = rentalList.stream().filter(r -> r.getId().equals(id)).toList().getFirst().copy();
-        }
-        catch(NoSuchElementException e)
-        {
+    public Optional<Rental> findById(String id) {
+        try {
+            Rental rental = rentalList.stream().filter(r -> r.getId().equals(id)).toList().getFirst().copy();
+            return Optional.of(rental);
+        } catch(NoSuchElementException e) {
             e.printStackTrace();
         }
-        return Optional.ofNullable(rental);
+        return Optional.empty();
     }
 
     @Override
-    public Optional<Rental> findByVehicleId(String id)
-    {
-        Rental rental = null;
-        try
-        {
-            rental = rentalList.stream().filter(r -> r.getVehicleId().equals(id)).toList().getFirst().copy();
-        }
-        catch(NoSuchElementException e)
-        {
+    public Optional<Rental> findByVehicleId(String id) {
+        try {
+            Rental rental = rentalList.stream().filter(r -> r.getVehicleId().equals(id)).toList().getFirst().copy();
+            return Optional.of(rental);
+        } catch(NoSuchElementException e) {
             e.printStackTrace();
         }
-        return Optional.ofNullable(rental);
+        return Optional.empty();
     }
 
     @Override
-    public Optional<Rental> findByIdAndReturnDateIsNull(String id)
-    {
-        Rental rental = null;
-        try
-        {
-            rental = rentalList.stream().filter(r -> r.getId().equals(id) && r.isActive()).toList().getFirst().copy();
-        }
-        catch(NoSuchElementException e)
-        {
+    public Optional<Rental> findByUserId(String id) {
+        try {
+            Rental rental = rentalList.stream().filter(r -> r.getUserId().equals(id)).toList().getFirst().copy();
+            return Optional.of(rental);
+        } catch(NoSuchElementException e) {
             e.printStackTrace();
         }
-        return Optional.ofNullable(rental);
+        return Optional.empty();
     }
 
     @Override
-    public void add(Rental rental)
-    {
+    public Optional<Rental> findByIdAndReturnDateIsNull(String id) {
+        try {
+            Rental rental = rentalList.stream().filter(r -> r.getId().equals(id) && r.isActive()).toList().getFirst().copy();
+            return Optional.of(rental);
+        } catch(NoSuchElementException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public void add(Rental rental) {
         List<Rental> appendedList = new ArrayList<>(rentalList);
         appendedList.add(rental);
         rentalList = appendedList;
     }
 
     @Override
-    public void removeById(String id)
-    {
+    public void removeById(String id) {
         rentalList = rentalList.stream().filter(r -> r.getId().compareTo(id) != 0).toList();
     }
 

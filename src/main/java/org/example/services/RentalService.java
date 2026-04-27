@@ -1,50 +1,57 @@
 package org.example.services;
 
 import org.example.models.Rental;
-import org.example.repositories.RentalJsonRepository;
 import org.example.repositories.RentalRepository;
 
 import java.util.List;
 
-public class RentalService
-{
-    private RentalRepository rentalRepository;
+public class RentalService {
 
-    public RentalService(String filename)
-    {
-        rentalRepository = new RentalJsonRepository(filename);
+    private RentalRepository repository;
+
+
+    public RentalService(RentalRepository repository) {
+        this.repository = repository;
+    }
+
+    public boolean rentalWithUserIdExist(String id) {
+        return repository.findByUserId(id).isPresent();
     }
 
     public List<Rental> getAll()
     {
-        return rentalRepository.getAll();
+        return repository.getAll();
     }
 
-    public Rental findById(String id)
-    {
-        return rentalRepository.findById(id)
+    public Rental findById(String id) {
+        return repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No rental with such id: " + id));
     }
 
-    public Rental findByIdAndReturnDateIsNull(String id)
-    {
-        return rentalRepository.findByIdAndReturnDateIsNull(id)
+    public Rental findByIdAndReturnDateIsNull(String id) {
+        return repository.findByIdAndReturnDateIsNull(id)
                 .orElseThrow(() -> new IllegalArgumentException("No active rental with such id: " + id));
     }
 
-    public Rental findByVehicleId(String id)
-    {
-        return rentalRepository.findById(id)
+    public Rental findByVehicleId(String id) {
+        return repository.findByVehicleId(id)
                 .orElseThrow(() -> new IllegalArgumentException("No rental with such vehicle id: " + id));
+    }
+
+    public Rental findByUserId(String id) {
+        return repository.findByUserId(id)
+                .orElseThrow(() -> new IllegalArgumentException("No rental with such user id: " + id));
     }
 
     public void add(Rental rental)
     {
-        rentalRepository.add(rental);
+        repository.add(rental);
     }
 
     public void removeById(String id)
     {
-        rentalRepository.removeById(id);
+        repository.removeById(id);
     }
+
+    public void save() { repository.save(); }
 }
