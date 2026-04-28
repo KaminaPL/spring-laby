@@ -23,6 +23,13 @@
         </dependency>
 
         <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.8</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.21.0</version>
@@ -48,7 +55,8 @@
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
             <scope>compile</scope>
-        </dependency>    </dependencies>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>

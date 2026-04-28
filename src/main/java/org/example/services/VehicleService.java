@@ -29,8 +29,7 @@ public class VehicleService {
         try {
             validator.validate(vehicle);
             repository.add(vehicle);
-        }
-        catch(IllegalStateException e) {
+        } catch(IllegalStateException e) {
             e.printStackTrace();
             throw new IllegalStateException("Vehicle is null");
         }

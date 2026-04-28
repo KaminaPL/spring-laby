@@ -270,8 +270,7 @@ public class Console {
             } else {
                 System.out.println("Can't remove item, it has not been returned yet.");
             }
-        } catch(IllegalArgumentException e)
-        {
+        } catch(IllegalArgumentException e) {
             e.printStackTrace();
             System.out.println("No vehicle found with such id.");
         }
