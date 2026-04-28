@@ -29,7 +29,7 @@ public class AuthService {
             throw new IllegalArgumentException("Register failed: passwords don't match");
         }
         else if(!userService.userExist(login)) {
-            userService.add(new User(UUID.randomUUID().toString(), login, BCrypt.hashpw(password, BCrypt.gensalt()), "user"));
+            userService.add(new User(UUID.randomUUID().toString(), login, BCrypt.hashpw(password, BCrypt.gensalt()), "User"));
             userService.save();
         }
     }
