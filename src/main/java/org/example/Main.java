@@ -1,5 +1,6 @@
 package org.example;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Map;
@@ -8,10 +9,16 @@ import java.util.UUID;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main
-{
-    public static void main(String[] args)
-    {
+public class Main{
+
+    public enum StorageType {
+        JSON_FILE,
+        DATABASE
+    }
+
+    public static void main(String[] args) {
+
+        /*
         Console console = new Console();
         Scanner sc = new Scanner(System.in);
         String command;
@@ -24,5 +31,7 @@ public class Main
                 console.readCommand(command);
             }
         }
+
+         */
     }
 }

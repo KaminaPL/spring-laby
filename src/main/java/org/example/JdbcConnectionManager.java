@@ -1,7 +1,11 @@
 package org.example;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Singular;
+
+import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class JdbcConnectionManager {
 
@@ -9,9 +13,10 @@ public class JdbcConnectionManager {
     private String url;
 
     private JdbcConnectionManager() {
-        url = System.getenv("DB_URL");
-        if(url == null) {
-            throw new RuntimeException("DB_URL not set.");
+        Dotenv dotenv = Dotenv.load();
+        url = dotenv.get("DATABASE_URL");
+        if (url == null) {
+            throw new RuntimeException("DATABASE_URL not set.");
         }
     }
 
@@ -22,7 +27,11 @@ public class JdbcConnectionManager {
         return instance;
     }
 
-
-
-
+    public Connection getConnection() {
+        try {
+            return DriverManager.getConnection(url);
+        } catch (SQLException e) {
+            throw new RuntimeException();
+        }
+    }
 }

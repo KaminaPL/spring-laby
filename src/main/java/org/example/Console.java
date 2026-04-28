@@ -29,23 +29,42 @@ public class Console {
     private final UserService userService;
     private final AuthService authService;
 
-    public Console() {
-        status = Status.ONGOING;
-        currentUser = null;
-        configService =  new VehicleCategoryConfigService(
-                new VehicleCategoryConfigJsonRepository("/home/bartosz/code/projects/java/Lab3/vehicle-configs.json")
-        );
-        vehicleService = new VehicleService(
-                new VehicleJsonRepository("/home/bartosz/code/projects/java/Lab3/vehicles.json"),
-                new VehicleValidator(configService)
-        );
-        rentalService = new RentalService(
-                new RentalJsonRepository("/home/bartosz/code/projects/java/Lab3/rentals.json")
-        );
-        userService = new UserService(
-                new UserJsonRepository("/home/bartosz/code/projects/java/Lab3/users.json")
-        );
-        authService = new AuthService(this.userService);
+    public Console(Main.StorageType storageType) {
+        if(storageType == Main.StorageType.JSON_FILE) {
+            status = Status.ONGOING;
+            currentUser = null;
+            configService =  new VehicleCategoryConfigService(
+                    new VehicleCategoryConfigJsonRepository("/home/bartosz/code/projects/java/Lab3/vehicle-configs.json")
+            );
+            vehicleService = new VehicleService(
+                    new VehicleJsonRepository("/home/bartosz/code/projects/java/Lab3/vehicles.json"),
+                    new VehicleValidator(configService)
+            );
+            rentalService = new RentalService(
+                    new RentalJsonRepository("/home/bartosz/code/projects/java/Lab3/rentals.json")
+            );
+            userService = new UserService(
+                    new UserJsonRepository("/home/bartosz/code/projects/java/Lab3/users.json")
+            );
+            authService = new AuthService(this.userService);
+        } else {
+            status = Status.ONGOING;
+            currentUser = null;
+            configService =  new VehicleCategoryConfigService(
+                    new VehicleCategoryConfigJsonRepository("/home/bartosz/code/projects/java/Lab3/vehicle-configs.json")
+            );
+            vehicleService = new VehicleService(
+                    new VehicleJsonRepository("/home/bartosz/code/projects/java/Lab3/vehicles.json"),
+                    new VehicleValidator(configService)
+            );
+            rentalService = new RentalService(
+                    new RentalJsonRepository("/home/bartosz/code/projects/java/Lab3/rentals.json")
+            );
+            userService = new UserService(
+                    new UserJsonRepository("/home/bartosz/code/projects/java/Lab3/users.json")
+            );
+            authService = new AuthService(this.userService);
+        }
     }
 
     public void readCommand(String command) {
