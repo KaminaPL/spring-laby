@@ -283,7 +283,7 @@ public class Console {
         try {
             Rental rental = rentalService.findByVehicleId(id);
             if(rental.isActive()) {
-                vehicleService.removeById(rental.getVehicleId());
+                vehicleService.removeById(id);
                 rentalService.removeById(rental.getId());
                 vehicleService.save();
                 rentalService.save();

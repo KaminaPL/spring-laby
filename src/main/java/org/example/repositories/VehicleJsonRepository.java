@@ -9,13 +9,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-public class VehicleJsonRepository implements VehicleRepository
-{
+public class VehicleJsonRepository implements VehicleRepository {
+
     private final JsonFileStorage<Vehicle> storage;
     private List<Vehicle> vehicleList;
 
-    public VehicleJsonRepository(String filename)
-    {
+    public VehicleJsonRepository(String filename) {
         storage = new JsonFileStorage<>(filename, new TypeToken<List<Vehicle>>() {}.getType());
         vehicleList = storage.load();
     }
@@ -27,32 +26,27 @@ public class VehicleJsonRepository implements VehicleRepository
     }
 
     @Override
-    public Optional<Vehicle> findById(String id)
-    {
-        Vehicle vehicle = null;
-        try
-        {
-            vehicle = vehicleList.stream().filter(v -> v.getId().equals(id)).toList().getFirst().copy();
-        }
-        catch (NoSuchElementException e)
-        {
+    public Optional<Vehicle> findById(String id) {
+        try {
+            Vehicle vehicle = vehicleList.stream().filter(v -> v.getId().equals(id)).toList().getFirst().copy();
+            return Optional.of(vehicle);
+
+        } catch (NoSuchElementException e) {
             e.printStackTrace();
         }
-        return Optional.ofNullable(vehicle);
+        return Optional.empty();
     }
 
     @Override
-    public void add(Vehicle vehicle)
-    {
+    public void add(Vehicle vehicle) {
         List<Vehicle> appendedList = new ArrayList<>(vehicleList);
         appendedList.add(vehicle);
         vehicleList = appendedList;
     }
 
     @Override
-    public void removeById(String id)
-    {
-        vehicleList = vehicleList.stream().filter(v -> v.getId().equals(id)).toList();
+    public void removeById(String id) {
+        vehicleList = vehicleList.stream().filter(v -> !v.getId().equals(id)).toList();
     }
 
     @Override
