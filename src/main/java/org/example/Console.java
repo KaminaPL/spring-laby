@@ -193,6 +193,7 @@ public class Console {
                 rentalService.removeById(foundRental.getId());
                 rentalService.add(foundRental);
                 rentalService.save();
+                System.out.println("Item rented.");
             }
         } catch(IllegalArgumentException e) {
             e.printStackTrace();
@@ -287,10 +288,11 @@ public class Console {
             return;
         }
         User user = userService.findByLogin(login);
-        if(!rentalService.rentalWithUserIdExist(user.getId())) {
-            userService.removeByLogin(login);
-        } else {
+        if(rentalService.rentalWithUserIdExist(user.getId())) {
             System.out.println("Cannot remove user. User has not returned a vehicle yet.");
+            return;
         }
+        userService.removeByLogin(login);
+        userService.save();
     }
 }
