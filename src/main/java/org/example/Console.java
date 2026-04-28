@@ -264,15 +264,14 @@ public class Console {
         try {
             Rental rental = rentalService.findByVehicleId(id);
             if(rental.isActive()) {
-                vehicleService.removeById(rental.getVehicleId());
+                vehicleService.removeById(id);
                 rentalService.removeById(rental.getId());
                 vehicleService.save();
                 rentalService.save();
             } else {
                 System.out.println("Can't remove item, it has not been returned yet.");
             }
-        } catch(IllegalArgumentException e)
-        {
+        } catch(IllegalArgumentException e) {
             e.printStackTrace();
             System.out.println("No vehicle found with such id.");
         }
