@@ -17,7 +17,7 @@ public interface RentalRepository
 
     Optional<Rental> findByIdAndReturnDateIsNull(String id);
 
-    void add(Rental rental);
+    Rental add(Rental rental);
 
     void removeById(String id);
 

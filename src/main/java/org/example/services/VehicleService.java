@@ -6,6 +6,7 @@ import org.example.repositories.VehicleCategoryConfigJsonRepository;
 import org.example.repositories.VehicleJsonRepository;
 import org.example.repositories.VehicleRepository;
 
+import java.util.Collections;
 import java.util.List;
 
 public class VehicleService {
@@ -25,23 +26,17 @@ public class VehicleService {
                 .orElseThrow(() -> new IllegalArgumentException("No vehicle with such id: " + id));
     }
 
-    public void add(Vehicle vehicle) {
+    public Vehicle add(Vehicle vehicle) {
         try {
             validator.validate(vehicle);
-            repository.add(vehicle);
-        }
-        catch(IllegalStateException e) {
-            e.printStackTrace();
-            throw new IllegalStateException("Vehicle is null");
-        }
-        catch(IllegalArgumentException e) {
-            e.printStackTrace();
-            throw new IllegalArgumentException("Vehicle attribute is missing or invalid");
+            return repository.add(vehicle);
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            e.getCause();
+            return  new Vehicle("", "", "", "", 0, 0.0, Collections.emptyMap());
         }
     }
 
-    public void removeById(String id)
-    {
+    public void removeById(String id) {
         repository.removeById(id);
     }
 

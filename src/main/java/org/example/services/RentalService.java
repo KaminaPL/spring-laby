@@ -14,8 +14,12 @@ public class RentalService {
         this.repository = repository;
     }
 
-    public boolean rentalWithUserIdExist(String id) {
+    public boolean rentalWithUserIdExists(String id) {
         return repository.findByUserId(id).isPresent();
+    }
+
+    public boolean rentalWithVehicleIdExists(String id) {
+        return repository.findByVehicleId(id).isPresent();
     }
 
     public List<Rental> getAll()
@@ -43,13 +47,11 @@ public class RentalService {
                 .orElseThrow(() -> new IllegalArgumentException("No rental with such user id: " + id));
     }
 
-    public void add(Rental rental)
-    {
-        repository.add(rental);
+    public Rental add(Rental rental) {
+        return repository.add(rental);
     }
 
-    public void removeById(String id)
-    {
+    public void removeById(String id) {
         repository.removeById(id);
     }
 

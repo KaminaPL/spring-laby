@@ -9,29 +9,26 @@ public class UserService {
 
     private final UserRepository repository;
 
-    public boolean userExist(String login) {
-        return repository.findByLogin(login).isPresent();
-    }
-    public List<User> getAll() { return repository.getAll(); }
-
-    public UserService(UserRepository repository)
-    {
+    public UserService(UserRepository repository) {
         this.repository = repository;
     }
 
-    public User findByLogin(String login)
-    {
+    public boolean userExists(String login) {
+        return repository.findByLogin(login).isPresent();
+    }
+
+    public List<User> getAll() { return repository.getAll(); }
+
+    public User findByLogin(String login) {
         return repository.findByLogin(login)
                 .orElseThrow(() -> new IllegalArgumentException("No user with such name: " + login));
     }
 
-    public void removeByLogin(String login)
-    {
+    public void removeByLogin(String login) {
         repository.removeByLogin(login);
     }
 
-    public void add(User user)
-    {
+    public void add(User user) {
         repository.add(user);
     }
 

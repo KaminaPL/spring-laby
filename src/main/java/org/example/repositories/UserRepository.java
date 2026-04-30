@@ -11,7 +11,7 @@ public interface UserRepository
 
    List<User> getAll();
 
-   void add(User user);
+   User add(User user);
 
    void removeByLogin(String login);
 

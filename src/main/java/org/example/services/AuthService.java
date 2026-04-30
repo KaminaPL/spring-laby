@@ -28,7 +28,7 @@ public class AuthService {
         if(password.compareTo(passwordConfirmation) != 0) {
             throw new IllegalArgumentException("Register failed: passwords don't match");
         }
-        else if(!userService.userExist(login)) {
+        else if(!userService.userExists(login)) {
             userService.add(new User(UUID.randomUUID().toString(), login, BCrypt.hashpw(password, BCrypt.gensalt()), "User"));
             userService.save();
         }

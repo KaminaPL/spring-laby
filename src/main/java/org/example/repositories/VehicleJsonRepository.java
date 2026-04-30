@@ -4,10 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import org.example.db.JsonFileStorage;
 import org.example.models.Vehicle;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 public class VehicleJsonRepository implements VehicleRepository {
 
@@ -20,8 +17,7 @@ public class VehicleJsonRepository implements VehicleRepository {
     }
 
     @Override
-    public List<Vehicle> getAll()
-    {
+    public List<Vehicle> getAll() {
         return vehicleList.stream().map(Vehicle::copy).toList();
     }
 
@@ -30,18 +26,20 @@ public class VehicleJsonRepository implements VehicleRepository {
         try {
             Vehicle vehicle = vehicleList.stream().filter(v -> v.getId().equals(id)).toList().getFirst().copy();
             return Optional.of(vehicle);
-
         } catch (NoSuchElementException e) {
-            e.printStackTrace();
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     @Override
-    public void add(Vehicle vehicle) {
+    public Vehicle add(Vehicle vehicle) {
         List<Vehicle> appendedList = new ArrayList<>(vehicleList);
+        String vehicleId = UUID.randomUUID().toString();
+        while(findById(vehicleId).isPresent()) vehicleId = UUID.randomUUID().toString();
+        vehicle.setId(vehicleId);
         appendedList.add(vehicle);
-        vehicleList = appendedList;
+        vehicleList = appendedList.stream().toList();
+        return vehicle.copy();
     }
 
     @Override
@@ -50,8 +48,7 @@ public class VehicleJsonRepository implements VehicleRepository {
     }
 
     @Override
-    public void save()
-    {
+    public void save() {
         storage.save(vehicleList);
     }
 }

@@ -11,7 +11,7 @@ public interface VehicleRepository
 
     List<Vehicle> getAll();
 
-    void add(Vehicle vehicle);
+    Vehicle add(Vehicle vehicle);
 
     void removeById(String id);
 

@@ -4,10 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import org.example.db.JsonFileStorage;
 import org.example.models.Rental;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 public class RentalJsonRepository implements RentalRepository {
 
@@ -31,9 +28,8 @@ public class RentalJsonRepository implements RentalRepository {
             Rental rental = rentalList.stream().filter(r -> r.getId().equals(id)).toList().getFirst().copy();
             return Optional.of(rental);
         } catch(NoSuchElementException e) {
-            e.printStackTrace();
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     @Override
@@ -42,9 +38,8 @@ public class RentalJsonRepository implements RentalRepository {
             Rental rental = rentalList.stream().filter(r -> r.getVehicleId().equals(id)).toList().getFirst().copy();
             return Optional.of(rental);
         } catch(NoSuchElementException e) {
-            e.printStackTrace();
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     @Override
@@ -53,9 +48,8 @@ public class RentalJsonRepository implements RentalRepository {
             Rental rental = rentalList.stream().filter(r -> r.getUserId().equals(id)).toList().getFirst().copy();
             return Optional.of(rental);
         } catch(NoSuchElementException e) {
-            e.printStackTrace();
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     @Override
@@ -64,16 +58,19 @@ public class RentalJsonRepository implements RentalRepository {
             Rental rental = rentalList.stream().filter(r -> r.getId().equals(id) && r.isActive()).toList().getFirst().copy();
             return Optional.of(rental);
         } catch(NoSuchElementException e) {
-            e.printStackTrace();
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     @Override
-    public void add(Rental rental) {
+    public Rental add(Rental rental) {
         List<Rental> appendedList = new ArrayList<>(rentalList);
+        String rentalId = UUID.randomUUID().toString();
+        while(findById(rentalId).isPresent()) rentalId = UUID.randomUUID().toString();
+        rental.setId(rentalId);
         appendedList.add(rental);
-        rentalList = appendedList;
+        rentalList = appendedList.stream().toList();
+        return rental.copy();
     }
 
     @Override
@@ -82,8 +79,7 @@ public class RentalJsonRepository implements RentalRepository {
     }
 
     @Override
-    public void save()
-    {
+    public void save() {
         storage.save(rentalList);
     }
 }

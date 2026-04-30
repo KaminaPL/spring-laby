@@ -13,55 +13,45 @@ public class UserJsonRepository implements UserRepository
     private final JsonFileStorage<User> storage;
     private List<User> userList;
 
-    public UserJsonRepository(String filename)
-    {
+    public UserJsonRepository(String filename) {
         storage = new JsonFileStorage<>(filename, new TypeToken<List<User>>() {}.getType());
         userList = storage.load();
     }
 
     @Override
-    public List<User> getAll()
-    {
-        return userList.stream().map(u -> u.copy()).toList();
+    public List<User> getAll() {
+        return userList.stream().map(User::copy).toList();
     }
 
     @Override
-    public Optional<User> findByLogin(String login)
-    {
-        try
-        {
+    public Optional<User> findByLogin(String login) {
+        try {
             User user = userList.stream().filter(u -> u.getLogin().equals(login)).toList().getFirst();
             return Optional.of(user.copy());
+        } catch(NoSuchElementException e) {
+            return Optional.empty();
         }
-        catch(NoSuchElementException e)
-        {
-           e.printStackTrace();
-        }
-        return Optional.empty();
     }
 
     @Override
-    public void add(User user)
-    {
+    public User add(User user) {
         userList.add(user.copy());
+        return user.copy();
     }
 
     @Override
-    public void removeByLogin(String login)
-    {
+    public void removeByLogin(String login) {
         userList = userList.stream().filter(u -> !u.getLogin().equals(login)).toList();
     }
 
     @Override
-    public void update(User user)
-    {
+    public void update(User user) {
         userList = userList.stream().filter(u -> !u.getLogin().equals(user.getLogin())).toList();
         userList.add(user.copy());
     }
 
     @Override
-    public void save()
-    {
+    public void save() {
         storage.save(userList);
     }
 }
