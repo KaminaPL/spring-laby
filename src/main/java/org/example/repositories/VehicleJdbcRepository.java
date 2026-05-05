@@ -9,19 +9,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class VehicleJdbcRepository implements VehicleRepository {
 
-    private List<Vehicle> vehicleList;
     private final Gson gson = new Gson();
 
     public VehicleJdbcRepository() {
-        String stm = "CREATE IF NOT EXISTS vehicles (id TEXT PRIMARY KEY, category TEXT NOT NULL, brand TEXT NOT NULL, " +
-                "model TEXT NOT NULL, year INT NOT NULL, price NUMERIC NOT NULL, attributes JSONB)";
+        String stm = "CREATE TABLE IF NOT EXISTS vehicles (id TEXT PRIMARY KEY, category TEXT NOT NULL," +
+                "brand TEXT NOT NULL, model TEXT NOT NULL, year INT NOT NULL, price NUMERIC NOT NULL, attributes JSONB)";
         try(Connection con = JdbcConnectionManager.getInstance().getConnection();
         PreparedStatement pstm = con.prepareStatement(stm)) {
             pstm.execute();
@@ -89,6 +85,14 @@ public class VehicleJdbcRepository implements VehicleRepository {
 
     @Override
     public void add(Vehicle vehicle) {
+        if(vehicle.getId() == null || vehicle.getId().isBlank()) {
+            vehicle.setId(UUID.randomUUID().toString());
+            while(findById(vehicle.getId()).isPresent()) {
+                vehicle.setId(UUID.randomUUID().toString());
+            }
+        } else {
+            removeById(vehicle.getId());
+        }
         String stm = "INSERT INTO vehicles (id, category, brand, model, year, price, attributes) VALUES" +
                 "(?, ?, ?, ?, ?, ?, ?::jsonb)";
         try(Connection con = JdbcConnectionManager.getInstance().getConnection();
@@ -99,6 +103,7 @@ public class VehicleJdbcRepository implements VehicleRepository {
             pstm.setInt(4, vehicle.getYear());
             pstm.setDouble(5, vehicle.getPrice());
             pstm.setString(6, gson.toJson(vehicle.getAttributes()));
+            pstm.execute();
         } catch(SQLException e) {
             e.printStackTrace();
         }
@@ -106,7 +111,14 @@ public class VehicleJdbcRepository implements VehicleRepository {
 
     @Override
     public void removeById(String id) {
-
+        String stm = "DELETE FROM vehicles WHERE id = ?";
+        try(Connection con = JdbcConnectionManager.getInstance().getConnection();
+            PreparedStatement pstm = con.prepareStatement(stm)) {
+            pstm.setString(1, id);
+            pstm.execute();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
