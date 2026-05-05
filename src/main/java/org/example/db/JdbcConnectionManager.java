@@ -1,7 +1,6 @@
-package org.example;
+package org.example.db;
 
 import io.github.cdimascio.dotenv.Dotenv;
-import lombok.Singular;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
