@@ -4,10 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import org.example.db.JsonFileStorage;
 import org.example.models.Vehicle;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 public class VehicleJsonRepository implements VehicleRepository {
 
@@ -39,6 +36,12 @@ public class VehicleJsonRepository implements VehicleRepository {
 
     @Override
     public void add(Vehicle vehicle) {
+        if(vehicle.getId().isBlank()) {
+            vehicle.setId(UUID.randomUUID().toString());
+            while(findById(vehicle.getId()).isPresent()) vehicle.setId(UUID.randomUUID().toString());
+        } else {
+            removeById(vehicle.getId());
+        }
         List<Vehicle> appendedList = new ArrayList<>(vehicleList);
         appendedList.add(vehicle);
         vehicleList = appendedList;

@@ -12,26 +12,33 @@ import java.util.UUID;
 public class Main{
 
     public enum StorageType {
-        JSON_FILE,
-        DATABASE
+        JSON,
+        JDBC
     }
 
     public static void main(String[] args) {
 
-        /*
-        Console console = new Console();
+        Console console = null;
         Scanner sc = new Scanner(System.in);
         String command;
+        System.out.print("Which repository do you want to use: ");
+        command = sc.nextLine();
+        System.out.print("\n\n");
 
-        while(console.getStatus() == Console.Status.ONGOING)
-        {
-            command = sc.nextLine();
-            if(!command.isEmpty())
+        if(command.equals("json")) console = new Console(StorageType.JSON);
+        else if(command.equals("jdbc")) console = new Console(StorageType.JDBC);
+        else System.out.println("Invalid argument.");
+
+        if(console != null) {
+            while(console.getStatus() == Console.Status.ONGOING)
             {
-                console.readCommand(command);
+                command = sc.nextLine();
+                if(!command.isEmpty())
+                {
+                    console.readCommand(command);
+                }
             }
         }
 
-         */
     }
 }

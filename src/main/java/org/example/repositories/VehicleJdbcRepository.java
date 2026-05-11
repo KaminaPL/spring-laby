@@ -36,8 +36,8 @@ public class VehicleJdbcRepository implements VehicleRepository {
                     if(rs.next()) {
                         String dbattr = rs.getString("attributes");
                         Map<String, Object> attr = gson.fromJson(dbattr,
-                                new TypeToken<Map<String, Object>>(){});
-                        Vehicle vehicle = new Vehicle(
+                                new TypeToken<>(){});
+                        return Optional.of(new Vehicle(
                                 rs.getString("id"),
                                 rs.getString("category"),
                                 rs.getString("brand"),
@@ -45,8 +45,7 @@ public class VehicleJdbcRepository implements VehicleRepository {
                                 rs.getInt("year"),
                                 rs.getFloat("price"),
                                 attr
-                        );
-                        return Optional.of(vehicle);
+                        ));
                     }
                 }
         } catch(SQLException e) {
@@ -98,11 +97,12 @@ public class VehicleJdbcRepository implements VehicleRepository {
         try(Connection con = JdbcConnectionManager.getInstance().getConnection();
             PreparedStatement pstm = con.prepareStatement(stm)) {
             pstm.setString(1, vehicle.getId());
-            pstm.setString(2, vehicle.getBrand());
-            pstm.setString(3, vehicle.getModel());
-            pstm.setInt(4, vehicle.getYear());
-            pstm.setDouble(5, vehicle.getPrice());
-            pstm.setString(6, gson.toJson(vehicle.getAttributes()));
+            pstm.setString(2, vehicle.getCategory());
+            pstm.setString(3, vehicle.getBrand());
+            pstm.setString(4, vehicle.getModel());
+            pstm.setInt(5, vehicle.getYear());
+            pstm.setDouble(6, vehicle.getPrice());
+            pstm.setString(7, gson.toJson(vehicle.getAttributes()));
             pstm.execute();
         } catch(SQLException e) {
             e.printStackTrace();

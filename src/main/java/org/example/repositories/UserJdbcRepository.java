@@ -20,7 +20,7 @@ public class UserJdbcRepository implements UserRepository {
     private final Gson gson = new Gson();
 
     public UserJdbcRepository() {
-        String stm = "CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY" +
+        String stm = "CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, " +
         "login TEXT UNIQUE, password TEXT NOT NULL, role TEXT NOT NULL)";
         try(Connection con = JdbcConnectionManager.getInstance().getConnection();
             PreparedStatement pstm = con.prepareStatement(stm)) {
@@ -40,7 +40,7 @@ public class UserJdbcRepository implements UserRepository {
                     User user = new User(
                             rs.getString("id"),
                             rs.getString("login"),
-                            rs.getString("passwword"),
+                            rs.getString("password"),
                             rs.getString("role")
                     );
                     return Optional.of(user);

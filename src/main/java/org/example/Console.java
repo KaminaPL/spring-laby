@@ -30,7 +30,7 @@ public class Console {
     private final AuthService authService;
 
     public Console(Main.StorageType storageType) {
-        if(storageType == Main.StorageType.JSON_FILE) {
+        if(storageType == Main.StorageType.JSON) {
             status = Status.ONGOING;
             currentUser = null;
             configService =  new VehicleCategoryConfigService(
@@ -51,17 +51,17 @@ public class Console {
             status = Status.ONGOING;
             currentUser = null;
             configService =  new VehicleCategoryConfigService(
-                    new VehicleCategoryConfigJsonRepository("/home/bartosz/code/projects/java/Lab3/vehicle-configs.json")
+                    new VehicleCategoryConfigJdbcRepository()
             );
             vehicleService = new VehicleService(
-                    new VehicleJsonRepository("/home/bartosz/code/projects/java/Lab3/vehicles.json"),
+                    new VehicleJdbcRepository(),
                     new VehicleValidator(configService)
             );
             rentalService = new RentalService(
-                    new RentalJsonRepository("/home/bartosz/code/projects/java/Lab3/rentals.json")
+                    new RentalJdbcRepository()
             );
             userService = new UserService(
-                    new UserJsonRepository("/home/bartosz/code/projects/java/Lab3/users.json")
+                    new UserJdbcRepository()
             );
             authService = new AuthService(this.userService);
         }
@@ -154,10 +154,9 @@ public class Console {
         List<Vehicle> vehicleList = vehicleService.getAll();
         vehicleList.forEach(v -> {
             try {
-                Rental rental = rentalService.findByVehicleId(v.getId());
                 System.out.println("id: " + v.getId());
-                if(rental.isActive()) System.out.println("rented: false");
-                else System.out.println("rented: true");
+                if(rentalService.rentalWithVehicleIdExists(v.getId())) System.out.println("rented: true");
+                else System.out.println("rented: false");
                 System.out.println("category: " + v.getCategory());
                 System.out.println("brand: " + v.getBrand());
                 System.out.println("model: " + v.getModel());
@@ -175,8 +174,7 @@ public class Console {
         List<Vehicle> vehicleList = vehicleService.getAll();
         vehicleList.forEach(v -> {
             try {
-                Rental rental = rentalService.findByVehicleId(v.getId());
-                if(rental.isActive()) {
+                if(!rentalService.rentalWithVehicleIdExists(v.getId())) {
                     System.out.println("id: " + v.getId());
                     System.out.println("category: " + v.getCategory());
                     System.out.println("brand: " + v.getBrand());
@@ -184,7 +182,7 @@ public class Console {
                     System.out.println("year: " + v.getYear());
                     System.out.println("price: " + v.getPrice());
                     v.getAttributes().forEach((key, value) -> System.out.println(key + ": " + value.toString()));
-                    System.out.print("\n\n");
+                    System.out.print("\n");
                 }
             } catch(IllegalArgumentException e) {
                 e.printStackTrace();
@@ -193,27 +191,25 @@ public class Console {
     }
 
     private void rentItem() {
-        List<Rental> rentals = rentalService.getAll();
-        rentals = rentals.stream().filter(it -> it.getUserId().equals(currentUser.getId())).toList();
-        if(!rentals.isEmpty()) {
+        if(rentalService.rentalWithUserIdExist(currentUser.getId())){
             System.out.println("Can't rent another vehicle. You still haven't returned one.");
             return;
         }
-        String id;
+        String vehicleId;
         Scanner sc = new Scanner(System.in);
         System.out.print("Vehicle id: ");
-        id = sc.nextLine();
+        vehicleId = sc.nextLine();
         try {
-            Rental foundRental = rentalService.findByVehicleId(id);
-            if(foundRental.isActive()) {
-                foundRental.setUserId(currentUser.getId());
-                foundRental.setRentDateTime(LocalDate.now().toString());
-                foundRental.setReturnDateTime(LocalDate.now().plusMonths(2).toString());
-                rentalService.removeById(foundRental.getId());
-                rentalService.add(foundRental);
-                rentalService.save();
-                System.out.println("Item rented.");
-            }
+            Rental rental = new Rental(
+                    "",
+                    vehicleId,
+                    currentUser.getId(),
+                    LocalDate.now().toString(),
+                    LocalDate.now().plusMonths(2).toString()
+            );
+            rentalService.add(rental);
+            rentalService.save();
+            System.out.println("Item rented.");
         } catch(IllegalArgumentException e) {
             e.printStackTrace();
         }
@@ -221,13 +217,8 @@ public class Console {
 
     private void returnItem() {
         try {
-            List<Rental> rentals = rentalService.getAll();
-            Rental rental = rentals.stream().filter(it -> it.getUserId().equals(currentUser.getId())).toList().getFirst();
-            rental.setUserId("");
-            rental.setRentDateTime("");
-            rental.setReturnDateTime("");
+            Rental rental = rentalService.findByUserId(currentUser.getId());
             rentalService.removeById(rental.getId());
-            rentalService.add(rental);
             rentalService.save();
             System.out.println("Item returned.");
         } catch (NoSuchElementException e) {
@@ -249,8 +240,6 @@ public class Console {
         year = sc.nextLine();
         System.out.print("Price: ");
         price = sc.nextLine();
-        String vehicleId = UUID.randomUUID().toString();
-        String rentalId = UUID.randomUUID().toString();
         Map<String, Object> attributes = new HashMap<>();
         VehicleCategoryConfig config = configService.findByCategory(category);
         Map<String, String> expectedAttributes = config.getAttributes();
@@ -263,36 +252,29 @@ public class Console {
                 case "integer" -> attributes.put(key, sc.nextInt());
             }
         });
-        Vehicle vehicle = new Vehicle(vehicleId, category, brand, model, Integer.parseInt(year), Double.parseDouble(price), attributes);
-        Rental rental = new Rental(rentalId, vehicleId, "", "", "");
+        Vehicle vehicle = new Vehicle("", category, brand, model, Integer.parseInt(year), Double.parseDouble(price), attributes);
         try {
             vehicleService.add(vehicle);
-            rentalService.add(rental);
             vehicleService.save();
-            rentalService.save();
         } catch(IllegalArgumentException | IllegalStateException e) {
             e.printStackTrace();
         }
     }
 
     private void removeItem() {
-        String id;
+        String vehicleId;
         Scanner sc = new Scanner(System.in);
         System.out.print("Vehicle id: ");
-        id = sc.nextLine();
+        vehicleId = sc.nextLine();
         try {
-            Rental rental = rentalService.findByVehicleId(id);
-            if(rental.isActive()) {
-                vehicleService.removeById(id);
-                rentalService.removeById(rental.getId());
+            if(!rentalService.rentalWithVehicleIdExists(vehicleId)) {
+                vehicleService.removeById(vehicleId);
                 vehicleService.save();
-                rentalService.save();
             } else {
                 System.out.println("Can't remove item, it has not been returned yet.");
             }
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             e.printStackTrace();
-            System.out.println("No vehicle found with such id.");
         }
     }
 
@@ -301,7 +283,7 @@ public class Console {
         Scanner sc = new Scanner(System.in);
         System.out.print("User login: ");
         login = sc.nextLine();
-        if(!userService.userExist(login)) {
+        if(!userService.userExists(login)) {
             System.out.println("User not found.");
             return;
         }

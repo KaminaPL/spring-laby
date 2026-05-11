@@ -14,8 +14,13 @@ public class RentalService {
         this.repository = repository;
     }
 
-    public boolean rentalWithUserIdExist(String id) {
-        return repository.findByUserId(id).isPresent();
+    public boolean rentalWithUserIdExist(String userId) {
+        return repository.findByUserId(userId).isPresent();
+    }
+
+    public boolean rentalWithVehicleIdExists(String vehicleId) {
+        return repository.findByVehicleId(vehicleId).isPresent();
+
     }
 
     public List<Rental> getAll()
@@ -33,14 +38,14 @@ public class RentalService {
                 .orElseThrow(() -> new IllegalArgumentException("No active rental with such id: " + id));
     }
 
-    public Rental findByVehicleId(String id) {
-        return repository.findByVehicleId(id)
-                .orElseThrow(() -> new IllegalArgumentException("No rental with such vehicle id: " + id));
+    public Rental findByVehicleId(String vehicleId) {
+        return repository.findByVehicleId(vehicleId)
+                .orElseThrow(() -> new IllegalArgumentException("No rental with such vehicle id: " + vehicleId));
     }
 
-    public Rental findByUserId(String id) {
-        return repository.findByUserId(id)
-                .orElseThrow(() -> new IllegalArgumentException("No rental with such user id: " + id));
+    public Rental findByUserId(String userId) {
+        return repository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("No rental with such user id: " + userId));
     }
 
     public void add(Rental rental)

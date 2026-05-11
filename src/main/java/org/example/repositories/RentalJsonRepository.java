@@ -4,10 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import org.example.db.JsonFileStorage;
 import org.example.models.Rental;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 public class RentalJsonRepository implements RentalRepository {
 
@@ -71,6 +68,12 @@ public class RentalJsonRepository implements RentalRepository {
 
     @Override
     public void add(Rental rental) {
+        if(rental.getId().isBlank()) {
+            rental.setId(UUID.randomUUID().toString());
+            while(findById(rental.getId()).isPresent()) rental.setId(UUID.randomUUID().toString());
+        } else {
+            removeById(rental.getId());
+        }
         List<Rental> appendedList = new ArrayList<>(rentalList);
         appendedList.add(rental);
         rentalList = appendedList;

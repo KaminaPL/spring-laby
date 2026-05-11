@@ -10,7 +10,7 @@ public class UserService {
 
     private final UserRepository repository;
 
-    public boolean userExist(String login) {
+    public boolean userExists(String login) {
         return repository.findByLogin(login).isPresent();
     }
 

@@ -26,16 +26,12 @@ public class UserJsonRepository implements UserRepository
     }
 
     @Override
-    public Optional<User> findByLogin(String login)
-    {
-        try
-        {
+    public Optional<User> findByLogin(String login) {
+        try {
             User user = userList.stream().filter(u -> u.getLogin().equals(login)).toList().getFirst();
             return Optional.of(user.copy());
-        }
-        catch(NoSuchElementException e)
-        {
-           e.printStackTrace();
+        } catch(NoSuchElementException e) {
+          // e.printStackTrace();
         }
         return Optional.empty();
     }
