@@ -5,7 +5,7 @@ import org.example.models.Rental;
 import java.util.List;
 import java.util.Optional;
 
-public interface RentalRepository
+public interface IRentalRepository
 {
     List<Rental> getAll();
 
