@@ -1,10 +1,8 @@
 package org.example.repositories;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.example.db.JdbcConnectionManager;
 import org.example.models.Rental;
-import org.example.models.Vehicle;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

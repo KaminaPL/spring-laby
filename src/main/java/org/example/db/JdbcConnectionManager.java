@@ -9,13 +9,13 @@ import java.sql.SQLException;
 public class JdbcConnectionManager {
 
     private static JdbcConnectionManager instance = null;
-    private String url;
+    private final String url;
 
     private JdbcConnectionManager() {
         Dotenv dotenv = Dotenv.load();
-        url = dotenv.get("DATABASE_URL");
+        url = dotenv.get("DB_URL");
         if (url == null) {
-            throw new RuntimeException("DATABASE_URL not set.");
+            throw new RuntimeException("DB_URL not set.");
         }
     }
 

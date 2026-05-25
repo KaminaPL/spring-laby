@@ -8,7 +8,7 @@ import org.example.repositories.VehicleRepository;
 
 import java.util.List;
 
-public class VehicleService {
+public class VehicleService implements VehicleServiceInterface {
 
     private final VehicleRepository repository;
     private final VehicleValidator validator;
@@ -39,8 +39,7 @@ public class VehicleService {
         }
     }
 
-    public void removeById(String id)
-    {
+    public void removeById(String id) {
         repository.removeById(id);
     }
 

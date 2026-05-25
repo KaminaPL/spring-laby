@@ -3,14 +3,15 @@ package org.example;
 import org.example.models.Vehicle;
 import org.example.models.VehicleCategoryConfig;
 import org.example.services.VehicleCategoryConfigService;
+import org.example.services.VehicleCategoryConfigServiceInterface;
 
 import java.util.Map;
 
 public class VehicleValidator {
 
-    private final VehicleCategoryConfigService configService;
+    private final VehicleCategoryConfigServiceInterface configService;
 
-    public VehicleValidator(VehicleCategoryConfigService configService) {
+    public VehicleValidator(VehicleCategoryConfigServiceInterface configService) {
         this.configService = configService;
     }
 

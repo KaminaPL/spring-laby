@@ -5,7 +5,7 @@ import org.example.repositories.RentalRepository;
 
 import java.util.List;
 
-public class RentalService {
+public class RentalService implements RentalServiceInterface{
 
     private RentalRepository repository;
 

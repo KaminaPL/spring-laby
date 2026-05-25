@@ -1,6 +1,15 @@
 package org.example.models;
 
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.*;
+import org.hibernate.annotations.ColumnTransformer;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
 
 import java.util.Map;
 
@@ -11,33 +20,46 @@ import java.util.Map;
 @Builder
 @EqualsAndHashCode(of="id")
 @ToString
-public class Vehicle
-{
+@Entity
+@Table(name = "vehicles")
+public class Vehicle {
+
+    @Id
+    @Column(nullable = false, unique = true)
     private String id;
+
+    @Column(nullable = false)
     private String category;
+
+    @Column(nullable = false)
     private String brand;
+
+    @Column(nullable = false)
     private String model;
+
+    @Column(nullable = false)
     private int year;
+
+    @Column(nullable = false)
     private double price;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
     private Map<String, Object> attributes;
 
-    Object getAttribute(String key)
-    {
+    Object getAttribute(String key) {
         return attributes.get(key);
     }
 
-    void removeAttribute(String key)
-    {
+    void removeAttribute(String key) {
         attributes.remove(key);
     }
 
-    void addAttribute(String key, Object value)
-    {
+    void addAttribute(String key, Object value) {
         attributes.put(key, value);
     }
 
-    public Vehicle copy()
-    {
+    public Vehicle copy() {
         return Vehicle.builder()
                 .id(id)
                 .category(category)

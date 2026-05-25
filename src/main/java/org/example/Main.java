@@ -1,6 +1,7 @@
 package org.example;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import org.example.db.HibernateConfig;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Map;
@@ -13,11 +14,11 @@ public class Main{
 
     public enum StorageType {
         JSON,
-        JDBC
+        JDBC,
+        HIBERNATE
     }
 
     public static void main(String[] args) {
-
         Console console = null;
         Scanner sc = new Scanner(System.in);
         String command;
@@ -25,16 +26,17 @@ public class Main{
         command = sc.nextLine();
         System.out.print("\n\n");
 
-        if(command.equals("json")) console = new Console(StorageType.JSON);
-        else if(command.equals("jdbc")) console = new Console(StorageType.JDBC);
-        else System.out.println("Invalid argument.");
+        switch(command) {
+            case "json" ->  console = new Console(StorageType.JSON);
+            case "jdbc" -> console = new Console(StorageType.JDBC);
+            case "hibernate" -> console = new Console(StorageType.HIBERNATE);
+            default -> System.out.println("Invalid argument.");
+        }
 
         if(console != null) {
-            while(console.getStatus() == Console.Status.ONGOING)
-            {
+            while(console.getStatus() == Console.Status.ONGOING) {
                 command = sc.nextLine();
-                if(!command.isEmpty())
-                {
+                if(!command.isEmpty()) {
                     console.readCommand(command);
                 }
             }

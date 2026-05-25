@@ -23,11 +23,11 @@ public class Console {
     @Getter
     private Status status;
     private User currentUser;
-    private final VehicleCategoryConfigService configService;
-    private final VehicleService vehicleService;
-    private final RentalService rentalService;
-    private final UserService userService;
-    private final AuthService authService;
+    private final VehicleCategoryConfigServiceInterface configService;
+    private final VehicleServiceInterface vehicleService;
+    private final RentalServiceInterface rentalService;
+    private final UserServiceInterface userService;
+    private final AuthServiceInterface authService;
 
     public Console(Main.StorageType storageType) {
         if(storageType == Main.StorageType.JSON) {
@@ -46,8 +46,8 @@ public class Console {
             userService = new UserService(
                     new UserJsonRepository("/home/bartosz/code/projects/java/Lab3/users.json")
             );
-            authService = new AuthService(this.userService);
-        } else {
+            authService = new AuthService(userService);
+        } else if(storageType == Main.StorageType.JDBC){
             status = Status.ONGOING;
             currentUser = null;
             configService =  new VehicleCategoryConfigService(
@@ -63,7 +63,24 @@ public class Console {
             userService = new UserService(
                     new UserJdbcRepository()
             );
-            authService = new AuthService(this.userService);
+            authService = new AuthService(userService);
+        } else {
+            status = Status.ONGOING;
+            currentUser = null;
+            configService =  new VehicleCategoryConfigService(
+                    new VehicleCategoryConfigHibernateRepository()
+            );
+            vehicleService = new VehicleService(
+                    new VehicleHibernateRepository(),
+                    new VehicleValidator(configService)
+            );
+            rentalService = new RentalService(
+                    new RentalHibernateRepository()
+            );
+            userService = new UserService(
+                    new UserHibernateRepository()
+            );
+            authService = new AuthService(userService);
         }
     }
 

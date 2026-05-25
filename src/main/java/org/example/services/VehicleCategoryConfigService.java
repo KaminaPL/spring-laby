@@ -5,7 +5,7 @@ import org.example.repositories.VehicleCategoryConfigRepository;
 
 import java.util.List;
 
-public class VehicleCategoryConfigService {
+public class VehicleCategoryConfigService implements VehicleCategoryConfigServiceInterface{
 
     private final VehicleCategoryConfigRepository configRepository;
 
