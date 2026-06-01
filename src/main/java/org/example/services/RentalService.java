@@ -1,11 +1,13 @@
 package org.example.services;
 
 import org.example.models.Rental;
+import org.example.models.Vehicle;
 import org.example.repositories.RentalRepository;
 
 import java.util.List;
+import java.util.Optional;
 
-public class RentalService implements RentalServiceInterface{
+public class RentalService implements RentalServiceInterface {
 
     private RentalRepository repository;
 
@@ -14,13 +16,12 @@ public class RentalService implements RentalServiceInterface{
         this.repository = repository;
     }
 
-    public boolean rentalWithUserIdExist(String userId) {
+    public boolean activeRentalWithUserIdExists(String userId) {
         return repository.findByUserId(userId).isPresent();
     }
 
-    public boolean rentalWithVehicleIdExists(String vehicleId) {
+    public boolean activeRentalWithVehicleIdExists(String vehicleId) {
         return repository.findByVehicleId(vehicleId).isPresent();
-
     }
 
     public List<Rental> getAll()

@@ -4,7 +4,10 @@ import com.google.gson.reflect.TypeToken;
 import org.example.db.JsonFileStorage;
 import org.example.models.Rental;
 
+import java.time.LocalDate;
 import java.util.*;
+
+import static java.util.stream.Collectors.toList;
 
 public class RentalJsonRepository implements RentalRepository {
 
@@ -19,7 +22,7 @@ public class RentalJsonRepository implements RentalRepository {
     @Override
     public List<Rental> getAll()
     {
-        return rentalList.stream().map(Rental::copy).toList();
+        return rentalList.stream().filter(Rental::isActive).map(Rental::copy).toList();
     }
 
     @Override
@@ -36,7 +39,8 @@ public class RentalJsonRepository implements RentalRepository {
     @Override
     public Optional<Rental> findByVehicleId(String id) {
         try {
-            Rental rental = rentalList.stream().filter(r -> r.getVehicleId().equals(id)).toList().getFirst().copy();
+            Rental rental = rentalList.stream().filter(r -> (r.getVehicle().getId().equals(id) && r.isActive()))
+                    .toList().getFirst().copy();
             return Optional.of(rental);
         } catch(NoSuchElementException e) {
             e.printStackTrace();
@@ -47,7 +51,8 @@ public class RentalJsonRepository implements RentalRepository {
     @Override
     public Optional<Rental> findByUserId(String id) {
         try {
-            Rental rental = rentalList.stream().filter(r -> r.getUserId().equals(id)).toList().getFirst().copy();
+            Rental rental = rentalList.stream().filter(r -> (r.getUser().getId().equals(id) && r.isActive()))
+                    .toList().getFirst().copy();
             return Optional.of(rental);
         } catch(NoSuchElementException e) {
             e.printStackTrace();
@@ -81,12 +86,16 @@ public class RentalJsonRepository implements RentalRepository {
 
     @Override
     public void removeById(String id) {
-        rentalList = rentalList.stream().filter(r -> r.getId().compareTo(id) != 0).toList();
+        findById(id).ifPresent(
+                r -> {
+                    r.setReturnDateTime(LocalDate.now().toString());
+                    add(r);
+                }
+        );
     }
 
     @Override
-    public void save()
-    {
+    public void save() {
         storage.save(rentalList);
     }
 }

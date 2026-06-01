@@ -1,10 +1,13 @@
 package org.example;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.example.db.HibernateConfig;
+import org.example.db.JdbcConnectionManager;
 import org.example.models.Rental;
 import org.example.models.User;
 import org.example.models.Vehicle;
@@ -30,9 +33,9 @@ public class Console {
     private final AuthServiceInterface authService;
 
     public Console(Main.StorageType storageType) {
+        status = Status.ONGOING;
+        currentUser = null;
         if(storageType == Main.StorageType.JSON) {
-            status = Status.ONGOING;
-            currentUser = null;
             configService =  new VehicleCategoryConfigService(
                     new VehicleCategoryConfigJsonRepository("/home/bartosz/code/projects/java/Lab3/vehicle-configs.json")
             );
@@ -48,8 +51,6 @@ public class Console {
             );
             authService = new AuthService(userService);
         } else if(storageType == Main.StorageType.JDBC){
-            status = Status.ONGOING;
-            currentUser = null;
             configService =  new VehicleCategoryConfigService(
                     new VehicleCategoryConfigJdbcRepository()
             );
@@ -64,9 +65,13 @@ public class Console {
                     new UserJdbcRepository()
             );
             authService = new AuthService(userService);
+            try {
+                JdbcConnectionManager.getInstance().getConnection().close();
+                System.out.println("Connected to JDBC repository.\n");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         } else {
-            status = Status.ONGOING;
-            currentUser = null;
             configService =  new VehicleCategoryConfigService(
                     new VehicleCategoryConfigHibernateRepository()
             );
@@ -81,6 +86,7 @@ public class Console {
                     new UserHibernateRepository()
             );
             authService = new AuthService(userService);
+            HibernateConfig.getSessionFactory().openSession().close();
         }
     }
 
@@ -103,8 +109,8 @@ public class Console {
                 password = sc.nextLine();
                 try {
                     currentUser = authService.authenticate(login, password);
+                    System.out.println("Successfully logged in.\n");
                 } catch(IllegalArgumentException e) {
-                    e.printStackTrace();
                     System.out.println("Log in failed, please try again.");
                 }
             }
@@ -172,7 +178,7 @@ public class Console {
         vehicleList.forEach(v -> {
             try {
                 System.out.println("id: " + v.getId());
-                if(rentalService.rentalWithVehicleIdExists(v.getId())) System.out.println("rented: true");
+                if(rentalService.activeRentalWithVehicleIdExists(v.getId())) System.out.println("rented: true");
                 else System.out.println("rented: false");
                 System.out.println("category: " + v.getCategory());
                 System.out.println("brand: " + v.getBrand());
@@ -191,7 +197,7 @@ public class Console {
         List<Vehicle> vehicleList = vehicleService.getAll();
         vehicleList.forEach(v -> {
             try {
-                if(!rentalService.rentalWithVehicleIdExists(v.getId())) {
+                if(!rentalService.activeRentalWithVehicleIdExists(v.getId())) {
                     System.out.println("id: " + v.getId());
                     System.out.println("category: " + v.getCategory());
                     System.out.println("brand: " + v.getBrand());
@@ -208,7 +214,7 @@ public class Console {
     }
 
     private void rentItem() {
-        if(rentalService.rentalWithUserIdExist(currentUser.getId())){
+        if(rentalService.activeRentalWithUserIdExists(currentUser.getId())){
             System.out.println("Can't rent another vehicle. You still haven't returned one.");
             return;
         }
@@ -217,12 +223,14 @@ public class Console {
         System.out.print("Vehicle id: ");
         vehicleId = sc.nextLine();
         try {
+            Vehicle vehicle = vehicleService.findById(vehicleId);
+            User user = userService.findByLogin(currentUser.getLogin());
             Rental rental = new Rental(
                     "",
-                    vehicleId,
-                    currentUser.getId(),
+                    vehicle,
+                    user,
                     LocalDate.now().toString(),
-                    LocalDate.now().plusMonths(2).toString()
+                    ""
             );
             rentalService.add(rental);
             rentalService.save();
@@ -238,8 +246,7 @@ public class Console {
             rentalService.removeById(rental.getId());
             rentalService.save();
             System.out.println("Item returned.");
-        } catch (NoSuchElementException e) {
-            e.printStackTrace();
+        } catch (NoSuchElementException | IllegalArgumentException e) {
             System.out.println("No rented item found.");
         }
     }
@@ -284,7 +291,7 @@ public class Console {
         System.out.print("Vehicle id: ");
         vehicleId = sc.nextLine();
         try {
-            if(!rentalService.rentalWithVehicleIdExists(vehicleId)) {
+            if(!rentalService.activeRentalWithVehicleIdExists(vehicleId)) {
                 vehicleService.removeById(vehicleId);
                 vehicleService.save();
             } else {
@@ -305,7 +312,7 @@ public class Console {
             return;
         }
         User user = userService.findByLogin(login);
-        if(rentalService.rentalWithUserIdExist(user.getId())) {
+        if(rentalService.activeRentalWithUserIdExists(user.getId())) {
             System.out.println("Cannot remove user. User has not returned a vehicle yet.");
             return;
         }

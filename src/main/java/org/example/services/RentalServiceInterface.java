@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface RentalServiceInterface {
 
-    boolean rentalWithUserIdExist(String userId);
+    boolean activeRentalWithUserIdExists(String userId);
 
-    boolean rentalWithVehicleIdExists(String vehicleId);
+    boolean activeRentalWithVehicleIdExists(String vehicleId);
 
     List<Rental> getAll();
 

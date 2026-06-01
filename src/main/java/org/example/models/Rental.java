@@ -17,11 +17,13 @@ public class Rental {
     @Column(nullable = false, unique = true)
     private String id;
 
-    @Column(name = "vehicle_id", nullable = false)
-    private String vehicleId;
+    @ManyToOne()
+    @JoinColumn(name = "vehicle_id", nullable = false)
+    private Vehicle vehicle;
 
-    @Column(name = "user_id", nullable = false)
-    private String userId;
+    @ManyToOne()
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "rent_date", nullable = false)
     private String rentDateTime;
@@ -32,8 +34,8 @@ public class Rental {
     public Rental copy() {
         return Rental.builder()
                 .id(id)
-                .vehicleId(vehicleId)
-                .userId(userId)
+                .vehicle(vehicle)
+                .user(user)
                 .rentDateTime(rentDateTime)
                 .returnDateTime(returnDateTime)
                 .build();

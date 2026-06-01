@@ -3,11 +3,14 @@ package org.example.repositories;
 import com.google.gson.Gson;
 import org.example.db.JdbcConnectionManager;
 import org.example.models.Rental;
+import org.example.models.User;
+import org.example.models.Vehicle;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.*;
 
 public class RentalJdbcRepository implements RentalRepository {
@@ -36,18 +39,31 @@ public class RentalJdbcRepository implements RentalRepository {
             try(ResultSet rs = pstm.executeQuery()) {
                 while(rs.next()) {
                     rentalList.add(new Rental(
-                        rs.getString("id"),
-                        rs.getString("vehicle_id"),
-                        rs.getString("user_id"),
-                        rs.getString("rent_date"),
-                        rs.getString("return_date")
+                            rs.getString("id"),
+                            new Vehicle(
+                                    rs.getString("vehicle_id"),
+                                    "",
+                                    "",
+                                    "",
+                                    0,
+                                    0.0,
+                                    new HashMap<>()
+                            ),
+                            new User(
+                                    rs.getString("user_id"),
+                                    "",
+                                    "",
+                                    ""
+                            ),
+                            rs.getString("rent_date"),
+                            rs.getString("return_date")
                     ));
                 }
             }
         } catch(SQLException e) {
             e.printStackTrace();
         }
-        return rentalList;
+        return rentalList.stream().filter(Rental::isActive).toList();
     }
 
     @Override
@@ -60,8 +76,21 @@ public class RentalJdbcRepository implements RentalRepository {
                 if (rs.next()) {
                     return Optional.of(new Rental(
                             rs.getString("id"),
-                            rs.getString("vehicle_id"),
-                            rs.getString("user_id"),
+                            new Vehicle(
+                                    rs.getString("vehicle_id"),
+                                    "",
+                                    "",
+                                    "",
+                                    0,
+                                    0.0,
+                                    new HashMap<>()
+                            ),
+                            new User(
+                                    rs.getString("user_id"),
+                                    "",
+                                    "",
+                                    ""
+                            ),
                             rs.getString("rent_date"),
                             rs.getString("return_date")
                     ));
@@ -75,7 +104,7 @@ public class RentalJdbcRepository implements RentalRepository {
 
     @Override
     public Optional<Rental> findByVehicleId(String vehicleId) {
-        String stm = "SELECT * FROM rentals WHERE vehicle_id = ?";
+        String stm = "SELECT * FROM rentals WHERE vehicle_id = ? AND return_date IS NULL";
         try(Connection con = JdbcConnectionManager.getInstance().getConnection();
             PreparedStatement pstm = con.prepareStatement(stm)) {
             pstm.setString(1, vehicleId);
@@ -83,10 +112,23 @@ public class RentalJdbcRepository implements RentalRepository {
                 if (rs.next()) {
                     return Optional.of(new Rental(
                             rs.getString("id"),
-                            rs.getString("vehicle_id"),
-                            rs.getString("user_id"),
+                            new Vehicle(
+                                    rs.getString("vehicle_id"),
+                                    "",
+                                    "",
+                                    "",
+                                    0,
+                                    0.0,
+                                    new HashMap<>()
+                            ),
+                            new User(
+                                    rs.getString("user_id"),
+                                    "",
+                                    "",
+                                    ""
+                            ),
                             rs.getString("rent_date"),
-                            rs.getString("return_date")
+                            null
                     ));
                 }
             }
@@ -98,7 +140,7 @@ public class RentalJdbcRepository implements RentalRepository {
 
     @Override
     public Optional<Rental> findByUserId(String userId) {
-        String stm = "SELECT * FROM rentals WHERE user_id = ?";
+        String stm = "SELECT * FROM rentals WHERE user_id = ? AND return_date IS NULL";
         try(Connection con = JdbcConnectionManager.getInstance().getConnection();
             PreparedStatement pstm = con.prepareStatement(stm)) {
             pstm.setString(1, userId);
@@ -106,10 +148,23 @@ public class RentalJdbcRepository implements RentalRepository {
                 if (rs.next()) {
                     return Optional.of(new Rental(
                             rs.getString("id"),
-                            rs.getString("vehicle_id"),
-                            rs.getString("user_id"),
+                            new Vehicle(
+                                    rs.getString("vehicle_id"),
+                                    "",
+                                    "",
+                                    "",
+                                    0,
+                                    0.0,
+                                    new HashMap<>()
+                            ),
+                            new User(
+                                    rs.getString("user_id"),
+                                    "",
+                                    "",
+                                    ""
+                            ),
                             rs.getString("rent_date"),
-                            rs.getString("return_date")
+                            null
                     ));
                 }
             }
@@ -121,18 +176,31 @@ public class RentalJdbcRepository implements RentalRepository {
 
     @Override
     public Optional<Rental> findByIdAndReturnDateIsNull(String id) {
-        String stm = "SELECT * FROM rentals WHERE id = ?";
+        String stm = "SELECT * FROM rentals WHERE id = ? AND return_date IS NULL";
         try(Connection con = JdbcConnectionManager.getInstance().getConnection();
             PreparedStatement pstm = con.prepareStatement(stm)) {
             pstm.setString(1, id);
             try(ResultSet rs = pstm.executeQuery()) {
-                if (rs.next() && rs.getString("return_date_time").isBlank()) {
+                if (rs.next()) {
                     return Optional.of(new Rental(
                             rs.getString("id"),
-                            rs.getString("vehicle_id"),
-                            rs.getString("user_id"),
+                            new Vehicle(
+                                    rs.getString("vehicle_id"),
+                                    "",
+                                    "",
+                                    "",
+                                    0,
+                                    0.0,
+                                    new HashMap<>()
+                            ),
+                            new User(
+                                    rs.getString("user_id"),
+                                    "",
+                                    "",
+                                    ""
+                            ),
                             rs.getString("rent_date"),
-                            rs.getString("return_date")
+                            null
                     ));
                 }
             }
@@ -149,18 +217,16 @@ public class RentalJdbcRepository implements RentalRepository {
             while(findById(rental.getId()).isPresent()) {
                 rental.setId(UUID.randomUUID().toString());
             }
-        } else {
-            removeById(rental.getId());
         }
         String stm = "INSERT INTO rentals (id, vehicle_id, user_id, rent_date, return_date)" +
                 "VALUES (?, ?, ?, ?, ?)";
         try(Connection con = JdbcConnectionManager.getInstance().getConnection();
             PreparedStatement pstm = con.prepareStatement(stm)) {
             pstm.setString(1, rental.getId());
-            pstm.setString(2, rental.getVehicleId());
-            pstm.setString(3, rental.getUserId());
+            pstm.setString(2, rental.getVehicle().getId());
+            pstm.setString(3, rental.getUser().getId());
             pstm.setString(4, rental.getRentDateTime());
-            pstm.setString(5, rental.getReturnDateTime());
+            pstm.setString(5, null);
             pstm.execute();
         } catch(SQLException e) {
             e.printStackTrace();
@@ -169,10 +235,11 @@ public class RentalJdbcRepository implements RentalRepository {
 
     @Override
     public void removeById(String id) {
-        String stm = "DELETE FROM vehicles WHERE id = ?";
+        String stm = "UPDATE rentals SET return_date = ? WHERE id = ?";
         try(Connection con = JdbcConnectionManager.getInstance().getConnection();
             PreparedStatement pstm = con.prepareStatement(stm)) {
-            pstm.setString(1, id);
+            pstm.setString(1, LocalDate.now().toString());
+            pstm.setString(2, id);
             pstm.execute();
         } catch(SQLException e) {
             e.printStackTrace();
