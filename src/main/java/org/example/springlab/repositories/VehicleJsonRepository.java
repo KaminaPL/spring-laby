@@ -30,7 +30,7 @@ public class VehicleJsonRepository implements VehicleRepository {
     @Override
     public Optional<Vehicle> findById(String id) {
         try {
-            Vehicle vehicle = vehicleList.stream().filter(v -> v.getId().equals(id)).toList().getFirst().copy();
+            Vehicle vehicle = vehicleList.stream().filter(v -> v.getId().equals(id)).toList().get(0).copy();
             return Optional.of(vehicle);
         } catch (NoSuchElementException e) {
             e.printStackTrace();

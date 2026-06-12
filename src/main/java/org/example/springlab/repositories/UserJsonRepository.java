@@ -31,7 +31,7 @@ public class UserJsonRepository implements UserRepository {
     @Override
     public Optional<User> findById(String id) {
         try {
-            User user = userList.stream().filter(u -> u.getId().equals(id)).toList().getFirst();
+            User user = userList.stream().filter(u -> u.getId().equals(id)).toList().get(0);
             return Optional.of(user.copy());
         } catch(NoSuchElementException e) {
           // e.printStackTrace();

@@ -33,7 +33,7 @@ public class VehicleCategoryConfigJsonRepository implements VehicleCategoryConfi
     public Optional<VehicleCategoryConfig> findByCategory(String category) {
         try {
             return Optional.ofNullable(configList.stream()
-                    .filter(c -> c.getCategory().equals(category)).toList().getFirst().copy());
+                    .filter(c -> c.getCategory().equals(category)).toList().get(0).copy());
         } catch (NoSuchElementException e) {
             e.printStackTrace();
         }

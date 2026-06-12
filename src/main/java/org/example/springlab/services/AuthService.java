@@ -20,7 +20,7 @@ public class AuthService implements AuthServiceInterface {
 
     @Override
     public User authenticate(String login, String password) {
-        User user = userService.getAll().stream().filter(u -> u.getLogin().equals(login)).toList().getFirst();
+        User user = userService.getAll().stream().filter(u -> u.getLogin().equals(login)).toList().get(0);
         if(!BCrypt.checkpw(password, user.getPassword())) {
             throw new IllegalArgumentException("Login failed: passwords don't match");
         }

@@ -31,7 +31,7 @@ public class RentalJsonRepository implements RentalRepository {
     @Override
     public Optional<Rental> findById(String id) {
         try {
-            Rental rental = rentalList.stream().filter(r -> r.getId().equals(id)).toList().getFirst().copy();
+            Rental rental = rentalList.stream().filter(r -> r.getId().equals(id)).toList().get(0).copy();
             return Optional.of(rental);
         } catch(NoSuchElementException e) {
             e.printStackTrace();
@@ -43,7 +43,7 @@ public class RentalJsonRepository implements RentalRepository {
     public Optional<Rental> findByVehicleId(String id) {
         try {
             Rental rental = rentalList.stream().filter(r -> (r.getVehicle().getId().equals(id) && r.isActive()))
-                    .toList().getFirst().copy();
+                    .toList().get(0).copy();
             return Optional.of(rental);
         } catch(NoSuchElementException e) {
             e.printStackTrace();
@@ -55,7 +55,7 @@ public class RentalJsonRepository implements RentalRepository {
     public Optional<Rental> findByUserId(String id) {
         try {
             Rental rental = rentalList.stream().filter(r -> (r.getUser().getId().equals(id) && r.isActive()))
-                    .toList().getFirst().copy();
+                    .toList().get(0).copy();
             return Optional.of(rental);
         } catch(NoSuchElementException e) {
             e.printStackTrace();
@@ -66,7 +66,7 @@ public class RentalJsonRepository implements RentalRepository {
    @Override
     public Optional<Rental> findByIdAndReturnDateIsNull(String id) {
         try {
-            Rental rental = rentalList.stream().filter(r -> r.getId().equals(id) && r.isActive()).toList().getFirst().copy();
+            Rental rental = rentalList.stream().filter(r -> r.getId().equals(id) && r.isActive()).toList().get(0).copy();
             return Optional.of(rental);
         } catch(NoSuchElementException e) {
             e.printStackTrace();

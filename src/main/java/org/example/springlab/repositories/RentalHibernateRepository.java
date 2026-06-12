@@ -39,7 +39,7 @@ public class RentalHibernateRepository implements RentalRepository {
             List<Rental> rentalList = entityManager.createQuery("from Rental", Rental.class).getResultList();
             return Optional.of(rentalList.stream()
                     .filter(r -> (r.getVehicle().getId().equals(vehicleId) && r.isActive()))
-                    .toList().getFirst());
+                    .toList().get(0));
         } catch (NoSuchElementException e) {
             // Some cool stuff here
         }
@@ -52,7 +52,7 @@ public class RentalHibernateRepository implements RentalRepository {
             List<Rental> rentalList = entityManager.createQuery("from Rental", Rental.class).getResultList();
             return Optional.of(rentalList.stream()
                     .filter(r -> (r.getUser().getId().equals(userId) && r.isActive()))
-                    .toList().getFirst());
+                    .toList().get(0));
         } catch (NoSuchElementException e) {
             // Some cool stuff here
         }
@@ -65,7 +65,7 @@ public class RentalHibernateRepository implements RentalRepository {
             List<Rental> rentalList = entityManager.createQuery("from Rental", Rental.class).getResultList();
             return Optional.of(rentalList.stream()
                     .filter(r -> (r.getId().equals(id) && r.isActive()))
-                    .toList().getFirst());
+                    .toList().get(0));
         } catch (NoSuchElementException e) {
 
         }

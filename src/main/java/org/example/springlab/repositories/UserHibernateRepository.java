@@ -32,7 +32,7 @@ public class UserHibernateRepository implements UserRepository {
            List<User> userList = entityManager.createQuery("from User", User.class).getResultList();
             return Optional.of(userList.stream()
                     .filter(u -> u.getId().equals(id))
-                    .toList().getFirst());
+                    .toList().get(0));
         } catch (NoSuchElementException e) {
             // Some cool stuff here
         }
@@ -56,7 +56,7 @@ public class UserHibernateRepository implements UserRepository {
             List<User> userList = entityManager.createQuery("from User", User.class).getResultList();
             entityManager.remove(userList.stream()
                     .filter(u -> u.getId().equals(id))
-                    .toList().getFirst());
+                    .toList().get(0));
         } catch (NoSuchElementException e) {
             // Some cool stuff here
         }
