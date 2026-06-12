@@ -1,0 +1,18 @@
+debug: true
+
+spring:
+  datasource:
+    url: ${DB_URL}
+    driver-class-name: org.postgresql.Driver
+  profiles:
+    active: ${APP_PROFILE:json}
+  main:
+    banner-mode: "off"
+server:
+  port: 8080
+spring-lab:
+  json:
+    users-file: users.json
+    vehicles-file: vehicles.json
+    rentals-file: rentals.json
+    configs-file: vehicle-configs.json

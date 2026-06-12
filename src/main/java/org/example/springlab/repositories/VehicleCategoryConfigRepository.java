@@ -1,0 +1,13 @@
+package org.example.springlab.repositories;
+
+import org.example.springlab.models.VehicleCategoryConfig;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface VehicleCategoryConfigRepository
+{
+    List<VehicleCategoryConfig> getAll();
+
+    Optional<VehicleCategoryConfig> findByCategory(String category);
+}
