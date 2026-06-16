@@ -56,10 +56,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/error").permitAll()
                                 .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                                .requestMatchers(r -> r.getMethod().equals("POST") &&
+                                .requestMatchers(r -> (r.getMethod().equals("POST") || r.getMethod().equals("DELETE")) &&
                                         r.getRequestURI().startsWith("/api/vehicles"))
-                                .authenticated()
+                                .hasRole("ADMIN")
                                 .anyRequest()
                                 .authenticated()
                 ).sessionManagement(session ->
