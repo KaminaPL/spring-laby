@@ -1,4 +1,4 @@
-package org.example.springlab.models;
+package org.example.springlab.dto.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
