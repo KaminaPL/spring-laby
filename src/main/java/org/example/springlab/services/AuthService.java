@@ -33,7 +33,7 @@ public class AuthService implements AuthServiceInterface {
             throw new IllegalArgumentException("Register failed: passwords don't match");
         }
         else if(!userService.userExists(login)) {
-            userService.add(new User(UUID.randomUUID().toString(), login, BCrypt.hashpw(password, BCrypt.gensalt()), "User"));
+            userService.add(new User(UUID.randomUUID().toString(), login, BCrypt.hashpw(password, BCrypt.gensalt()), "USER"));
             userService.save();
         }
     }

@@ -1,19 +1,12 @@
 package org.example.springlab.repositories;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
-import lombok.Setter;
-import org.example.springlab.db.HibernateConfig;
 import org.example.springlab.models.Rental;
-import org.example.springlab.models.Vehicle;
-import org.example.springlab.services.RentalServiceInterface;
-import org.hibernate.Session;
-import org.hibernate.SessionException;
-import org.hibernate.Transaction;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Repository
@@ -40,7 +33,7 @@ public class RentalHibernateRepository implements RentalRepository {
             return Optional.of(rentalList.stream()
                     .filter(r -> (r.getVehicle().getId().equals(vehicleId) && r.isActive()))
                     .toList().get(0));
-        } catch (NoSuchElementException e) {
+        } catch (ArrayIndexOutOfBoundsException | NoSuchElementException e) {
             // Some cool stuff here
         }
         return Optional.empty();
@@ -53,7 +46,7 @@ public class RentalHibernateRepository implements RentalRepository {
             return Optional.of(rentalList.stream()
                     .filter(r -> (r.getUser().getId().equals(userId) && r.isActive()))
                     .toList().get(0));
-        } catch (NoSuchElementException e) {
+        } catch (ArrayIndexOutOfBoundsException | NoSuchElementException e) {
             // Some cool stuff here
         }
         return Optional.empty();
@@ -66,7 +59,7 @@ public class RentalHibernateRepository implements RentalRepository {
             return Optional.of(rentalList.stream()
                     .filter(r -> (r.getId().equals(id) && r.isActive()))
                     .toList().get(0));
-        } catch (NoSuchElementException e) {
+        } catch (ArrayIndexOutOfBoundsException | NoSuchElementException e) {
 
         }
         return Optional.empty();
@@ -87,8 +80,7 @@ public class RentalHibernateRepository implements RentalRepository {
     public void removeById(String id) {
         Rental rental = entityManager.find(Rental.class, id);
         if(rental != null) {
-            rental.setRentDateTime("");
-            rental.setReturnDateTime("");
+            rental.setReturnDateTime(LocalDateTime.now().toString());
             entityManager.merge(rental);
         }
     }

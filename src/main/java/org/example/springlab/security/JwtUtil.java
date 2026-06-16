@@ -1,4 +1,4 @@
-package org.example.springlab.web;
+package org.example.springlab.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;

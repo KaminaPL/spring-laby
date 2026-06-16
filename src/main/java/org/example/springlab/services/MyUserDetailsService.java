@@ -1,4 +1,4 @@
-package org.example.springlab.web;
+package org.example.springlab.services;
 
 import lombok.RequiredArgsConstructor;
 import org.example.springlab.models.User;
@@ -17,6 +17,7 @@ import java.util.List;
 public class MyUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByLogin(username)

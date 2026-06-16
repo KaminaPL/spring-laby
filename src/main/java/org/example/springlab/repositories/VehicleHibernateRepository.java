@@ -2,17 +2,10 @@ package org.example.springlab.repositories;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import lombok.Setter;
-import org.example.springlab.db.HibernateConfig;
-import org.example.springlab.models.User;
 import org.example.springlab.models.Vehicle;
-import org.hibernate.Session;
-import org.hibernate.SessionException;
-import org.hibernate.Transaction;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

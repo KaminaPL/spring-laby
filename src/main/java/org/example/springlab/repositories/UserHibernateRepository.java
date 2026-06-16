@@ -1,15 +1,8 @@
 package org.example.springlab.repositories;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import lombok.Setter;
-import org.example.springlab.db.HibernateConfig;
-import org.example.springlab.models.Rental;
 import org.example.springlab.models.User;
-import org.hibernate.Session;
-import org.hibernate.SessionException;
-import org.hibernate.Transaction;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
@@ -33,7 +26,20 @@ public class UserHibernateRepository implements UserRepository {
             return Optional.of(userList.stream()
                     .filter(u -> u.getId().equals(id))
                     .toList().get(0));
-        } catch (NoSuchElementException e) {
+        } catch (ArrayIndexOutOfBoundsException | NoSuchElementException e) {
+            // Some cool stuff here
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<User> findByLogin(String login) {
+        try {
+            List<User> userList = entityManager.createQuery("from User", User.class).getResultList();
+            return Optional.of(userList.stream()
+                    .filter(u -> u.getLogin().equals(login))
+                    .toList().get(0));
+        } catch (ArrayIndexOutOfBoundsException | NoSuchElementException e) {
             // Some cool stuff here
         }
         return Optional.empty();
@@ -57,7 +63,7 @@ public class UserHibernateRepository implements UserRepository {
             entityManager.remove(userList.stream()
                     .filter(u -> u.getId().equals(id))
                     .toList().get(0));
-        } catch (NoSuchElementException e) {
+        } catch (ArrayIndexOutOfBoundsException | NoSuchElementException e) {
             // Some cool stuff here
         }
     }

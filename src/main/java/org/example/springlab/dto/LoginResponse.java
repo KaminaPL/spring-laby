@@ -1,4 +1,4 @@
-package org.example.springlab.security;
+package org.example.springlab.dto;
 
 public record LoginResponse(
         String token

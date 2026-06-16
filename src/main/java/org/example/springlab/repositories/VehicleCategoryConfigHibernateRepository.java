@@ -6,7 +6,6 @@ import org.example.springlab.models.VehicleCategoryConfig;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

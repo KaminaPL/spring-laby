@@ -1,4 +1,4 @@
-package org.example.springlab.security.web;
+package org.example.springlab.web;
 
 import org.example.springlab.VehicleValidator;
 import org.example.springlab.models.Vehicle;

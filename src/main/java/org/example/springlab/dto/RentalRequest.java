@@ -1,4 +1,4 @@
-package org.example.springlab.models;
+package org.example.springlab.dto;
 
 import lombok.*;
 
@@ -9,6 +9,5 @@ import lombok.*;
 @Builder
 public class RentalRequest {
 
-    private String id;
     private String vehicleId;
 }

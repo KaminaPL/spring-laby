@@ -33,6 +33,12 @@ public class UserService implements UserServiceInterface {
     }
 
     @Override
+    public User findByLogin(String login) {
+        return repository.findByLogin(login)
+                .orElseThrow(() -> new IllegalArgumentException("No user with such login: " + login));
+    }
+
+    @Override
     public void removeById(String id) {
         repository.removeById(id);
     }

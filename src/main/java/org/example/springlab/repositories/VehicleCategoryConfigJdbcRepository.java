@@ -2,7 +2,6 @@ package org.example.springlab.repositories;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import org.example.springlab.db.JdbcConnectionManager;
 import org.example.springlab.models.VehicleCategoryConfig;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.datasource.DataSourceUtils;

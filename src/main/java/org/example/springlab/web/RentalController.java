@@ -1,7 +1,7 @@
-package org.example.springlab.security.web;
+package org.example.springlab.web;
 
 import org.example.springlab.models.Rental;
-import org.example.springlab.models.RentalRequest;
+import org.example.springlab.dto.RentalRequest;
 import org.example.springlab.models.User;
 import org.example.springlab.models.Vehicle;
 import org.example.springlab.services.RentalServiceInterface;
@@ -45,7 +45,7 @@ public class RentalController {
     }
 
     @PostMapping("/rent")
-    public ResponseEntity<Rental> rent(
+    public ResponseEntity<Rental> rentVehicle(
             @RequestBody RentalRequest rentalRequest,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
@@ -53,19 +53,28 @@ public class RentalController {
         User user = userService.findByLogin(login);
         Vehicle vehicle = vehicleService.findById(rentalRequest.getVehicleId());
         Rental rental = new Rental("", vehicle, user, LocalDateTime.now().toString(), "");
-        rentalService.add(rental);
-        return ResponseEntity.status(HttpStatus.CREATED).body(rental);
+        if(!rentalService.activeRentalWithUserIdExists(user.getId()) &&
+                !rentalService.activeRentalWithVehicleIdExists(vehicle.getId())) {
+            rentalService.add(rental);
+            return ResponseEntity.status(HttpStatus.CREATED).body(rental);
+        }
+        return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
 
-    @PostMapping("/users/{userId}/return")
-    public Rental returnVehicle(@PathVariable String userId) {
-        if(!rentalService.activeRentalWithUserIdExists(userId)) {
-            throw new IllegalStateException("No rented vehicles found under that user id: " + userId);
+    @PostMapping("/return")
+    public ResponseEntity<Rental> returnVehicle(
+            @RequestBody RentalRequest rentalRequest,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        String login = userDetails.getUsername();
+        User user = userService.findByLogin(login);
+        if(rentalService.activeRentalWithUserIdExists(user.getId())) {
+            Rental rental = rentalService.findByUserId(user.getId());
+            rentalService.removeById(rental.getId());
+            return ResponseEntity.status(HttpStatus.OK).build();
         }
-        Rental rental = rentalService.findByUserId(userId);
-        rentalService.removeById(rental.getId());
-        return rental;
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
 }

@@ -14,6 +14,7 @@ import java.util.Optional;
 @Repository
 @Profile("json")
 public class UserJsonRepository implements UserRepository {
+
     private final JsonFileStorage<User> storage;
     private List<User> userList;
 
@@ -35,6 +36,17 @@ public class UserJsonRepository implements UserRepository {
             return Optional.of(user.copy());
         } catch(NoSuchElementException e) {
           // e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<User> findByLogin(String login) {
+        try {
+            User user = userList.stream().filter(u -> u.getLogin().equals(login)).toList().get(0);
+            return Optional.of(user.copy());
+        } catch(NoSuchElementException e) {
+            // e.printStackTrace();
         }
         return Optional.empty();
     }

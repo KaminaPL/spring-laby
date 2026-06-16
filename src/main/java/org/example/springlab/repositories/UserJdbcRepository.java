@@ -1,8 +1,6 @@
 package org.example.springlab.repositories;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import org.example.springlab.db.JdbcConnectionManager;
 import org.example.springlab.models.User;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.datasource.DataSourceUtils;
@@ -16,7 +14,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -46,6 +43,31 @@ public class UserJdbcRepository implements UserRepository {
         Connection con = DataSourceUtils.getConnection(dataSource);
         try(PreparedStatement pstm = con.prepareStatement(stm)) {
             pstm.setString(1, id);
+            try(ResultSet rs = pstm.executeQuery()) {
+                if(rs.next()) {
+                    User user = new User(
+                            rs.getString("id"),
+                            rs.getString("login"),
+                            rs.getString("password"),
+                            rs.getString("role")
+                    );
+                    return Optional.of(user);
+                }
+            }
+        } catch(SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DataSourceUtils.releaseConnection(con, dataSource);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<User> findByLogin(String login) {
+        String stm = "SELECT * FROM users WHERE login = ?";
+        Connection con = DataSourceUtils.getConnection(dataSource);
+        try(PreparedStatement pstm = con.prepareStatement(stm)) {
+            pstm.setString(1, login);
             try(ResultSet rs = pstm.executeQuery()) {
                 if(rs.next()) {
                     User user = new User(

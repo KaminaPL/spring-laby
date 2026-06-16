@@ -1,7 +1,6 @@
 package org.example.springlab.repositories;
 
 import com.google.gson.Gson;
-import org.example.springlab.db.JdbcConnectionManager;
 import org.example.springlab.models.Rental;
 import org.example.springlab.models.User;
 import org.example.springlab.models.Vehicle;
@@ -10,12 +9,11 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Repository
@@ -259,7 +257,7 @@ public class RentalJdbcRepository implements RentalRepository {
         String stm = "UPDATE rentals SET return_date = ? WHERE id = ?";
         Connection con = DataSourceUtils.getConnection(dataSource);
         try(PreparedStatement pstm = con.prepareStatement(stm)) {
-            pstm.setString(1, LocalDate.now().toString());
+            pstm.setString(1, LocalDateTime.now().toString());
             pstm.setString(2, id);
             pstm.execute();
         } catch(SQLException e) {

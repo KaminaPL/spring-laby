@@ -1,10 +1,11 @@
-package org.example.springlab.security.web;
+package org.example.springlab.web;
 
 import lombok.RequiredArgsConstructor;
-import org.example.springlab.models.User;
-import org.example.springlab.services.AuthService;
+import org.example.springlab.dto.LoginRequest;
+import org.example.springlab.dto.LoginResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,25 +14,30 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.example.springlab.security.web.JwtUtil;
+import org.example.springlab.security.JwtUtil;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final AuthService authService;
+
+    private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+
     @PostMapping("/login")
-    public ResponseEntity<org.example.springlab.security.web.LoginResponse> login(
-            @RequestBody org.example.springlab.security.web.LoginRequest loginRequest) {
-        User user;
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+        Authentication auth;
         try {
-            user = authService.authenticate(loginRequest.login(), loginRequest.password());
-        } catch (IllegalArgumentException e) {
-            // Something cool here
+            auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.login(),
+                            loginRequest.password())
+            );
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
         String token = jwtUtil.generateToken(userDetails);
-        return ResponseEntity.ok(new org.example.springlab.security.web.LoginResponse(token));
+        return ResponseEntity.ok(new LoginResponse(token));
     }
 }

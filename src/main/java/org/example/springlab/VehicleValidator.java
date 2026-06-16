@@ -5,7 +5,6 @@ package org.example.springlab;
 import org.example.springlab.models.Vehicle;
 import org.example.springlab.models.VehicleCategoryConfig;
 import org.example.springlab.services.VehicleCategoryConfigServiceInterface;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

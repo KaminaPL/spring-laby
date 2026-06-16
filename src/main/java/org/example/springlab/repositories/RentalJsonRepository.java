@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Repository
@@ -91,7 +91,7 @@ public class RentalJsonRepository implements RentalRepository {
     public void removeById(String id) {
         findById(id).ifPresent(
                 r -> {
-                    r.setReturnDateTime(LocalDate.now().toString());
+                    r.setReturnDateTime(LocalDateTime.now().toString());
                     add(r);
                 }
         );
