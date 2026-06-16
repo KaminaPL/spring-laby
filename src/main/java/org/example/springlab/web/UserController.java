@@ -1,12 +1,9 @@
-package org.example.springlab.web;
+package org.example.springlab.security.web;
 
-import org.example.springlab.models.Rental;
 import org.example.springlab.models.User;
-import org.example.springlab.services.RentalServiceInterface;
 import org.example.springlab.services.UserServiceInterface;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController()

@@ -1,9 +1,16 @@
-package org.example.springlab.web;
+package org.example.springlab.security.web;
 
 import org.example.springlab.models.Rental;
+import org.example.springlab.models.RentalRequest;
+import org.example.springlab.models.User;
+import org.example.springlab.models.Vehicle;
 import org.example.springlab.services.RentalServiceInterface;
 import org.example.springlab.services.UserServiceInterface;
 import org.example.springlab.services.VehicleServiceInterface;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -37,22 +44,19 @@ public class RentalController {
         return rentalService.getAll().stream().filter(r -> r.getUser().getId().equals(userId)).toList();
     }
 
-    @PostMapping("/users/{userId}/rent/{vehicleId}")
-    public Rental rentVehicle(@PathVariable String userId, @PathVariable String vehicleId) {
-        if(rentalService.activeRentalWithUserIdExists(userId)) {
-            throw new IllegalStateException("Cannot rent vehicle, user hasn't returned one yet.");
-        }
-        if(rentalService.activeRentalWithVehicleIdExists(vehicleId)) {
-            throw new IllegalStateException("Cannot rent vehicle, it has been already rented.");
-        }
-        rentalService.add(new Rental("",
-                vehicleService.findById(vehicleId),
-                userService.findById(userId),
-                LocalDateTime.now().toString(),
-                "")
-        );
-        return rentalService.findByUserId(userId);
+    @PostMapping("/rent")
+    public ResponseEntity<Rental> rent(
+            @RequestBody RentalRequest rentalRequest,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        String login = userDetails.getUsername();
+        User user = userService.findByLogin(login);
+        Vehicle vehicle = vehicleService.findById(rentalRequest.getVehicleId());
+        Rental rental = new Rental("", vehicle, user, LocalDateTime.now().toString(), "");
+        rentalService.add(rental);
+        return ResponseEntity.status(HttpStatus.CREATED).body(rental);
     }
+
 
     @PostMapping("/users/{userId}/return")
     public Rental returnVehicle(@PathVariable String userId) {

@@ -1,6 +1,5 @@
-package org.example.springlab.web;
+package org.example.springlab.security.web;
 
-import org.example.springlab.models.Vehicle;
 import org.example.springlab.models.VehicleCategoryConfig;
 import org.example.springlab.services.VehicleCategoryConfigServiceInterface;
 import org.springframework.web.bind.annotation.GetMapping;

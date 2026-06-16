@@ -1,4 +1,4 @@
-package org.example.springlab.web;
+package org.example.springlab.security.web;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,14 +1,11 @@
-package org.example.springlab.web;
+package org.example.springlab.security.web;
 
 import org.example.springlab.VehicleValidator;
 import org.example.springlab.models.Vehicle;
 import org.example.springlab.services.*;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
