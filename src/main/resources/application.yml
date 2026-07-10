@@ -8,14 +8,14 @@ spring:
     active: ${APP_PROFILE:json}
   main:
     banner-mode: "off"
+
 server:
   port: ${PORT:8080}
+
+stripe:
+  secret.key: ${STRIPE_SECRET_KEY}
+  webhook.secret: whsec_your_webhook_secret
+
 jwt:
   secret: ${JWT_SECRET:5Sy1-R-Zj7ajgcabswkEttARiS8Q4Vs9IhYCVAt1bQ0}
   expiration: ${JWT_EXPIRATION:3600000}
-spring-lab:
-  json:
-    users-file: users.json
-    vehicles-file: vehicles.json
-    rentals-file: rentals.json
-    configs-file: vehicle-configs.json

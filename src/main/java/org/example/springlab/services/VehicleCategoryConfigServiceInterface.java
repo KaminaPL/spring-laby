@@ -6,9 +6,7 @@ import java.util.List;
 
 public interface VehicleCategoryConfigServiceInterface {
 
-    boolean categoryExists(String category);
-
-    List<VehicleCategoryConfig> getAll();
+    List<VehicleCategoryConfig> findAll();
 
     VehicleCategoryConfig findByCategory(String category);
 }

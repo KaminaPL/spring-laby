@@ -3,18 +3,19 @@ package org.example.springlab.services;
 import org.example.springlab.models.Rental;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RentalServiceInterface {
 
-    boolean activeRentalWithUserIdExists(String userId);
+    boolean rentalExists(Rental rental);
 
-    boolean activeRentalWithVehicleIdExists(String vehicleId);
-
-    List<Rental> getAll();
+    List<Rental> findAll();
 
     Rental findById(String id);
 
-    Rental findByIdAndReturnDateIsNull(String id);
+    Rental findByIdAndReturnDateTimeIsNull(String id);
+
+    Rental findByUserIdAndReturnDateTimeIsNull(String userId);
 
     Rental findByVehicleId(String vehicleId);
 
@@ -23,6 +24,4 @@ public interface RentalServiceInterface {
     void add(Rental rental);
 
     void removeById(String id);
-
-    void save();
 }

@@ -21,7 +21,7 @@ public class VehicleCategoryConfigController {
 
     @GetMapping
     public List<VehicleCategoryConfig> getAll() {
-        return configService.getAll();
+        return configService.findAll();
     }
 
     @GetMapping("/{category}")

@@ -3,28 +3,30 @@ package org.example.springlab.services;
 import lombok.RequiredArgsConstructor;
 import org.example.springlab.models.User;
 import org.example.springlab.repositories.UserRepository;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
+@Transactional
 public class MyUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
+
+    public MyUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByLogin(username)
                 .orElseThrow(() -> new UsernameNotFoundException(username));
-        List<GrantedAuthority> authorities = List.of(
-                new SimpleGrantedAuthority("ROLE_" + user.getRole())
-        );
+        List<SimpleGrantedAuthority> authorities = user.getRoles().stream().map(r -> new SimpleGrantedAuthority(r.getName())).toList();
         return new org.springframework.security.core.userdetails.User(
                 user.getLogin(),
                 user.getPassword(),

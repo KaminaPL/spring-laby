@@ -3,6 +3,12 @@ package org.example.springlab.web;
 import lombok.RequiredArgsConstructor;
 import org.example.springlab.dto.LoginRequest;
 import org.example.springlab.dto.LoginResponse;
+import org.example.springlab.dto.RegisterRequest;
+import org.example.springlab.dto.RegisterResponse;
+import org.example.springlab.models.User;
+import org.example.springlab.services.AuthServiceInterface;
+import org.example.springlab.services.UserServiceInterface;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +28,8 @@ import org.example.springlab.security.JwtUtil;
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
+    private final AuthServiceInterface authService;
+    private final UserServiceInterface userService;
     private final JwtUtil jwtUtil;
 
     @PostMapping("/login")
@@ -39,5 +47,11 @@ public class AuthController {
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
         String token = jwtUtil.generateToken(userDetails);
         return ResponseEntity.ok(new LoginResponse(token));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest registerRequest) {
+        authService.register(registerRequest.login(), registerRequest.password(), registerRequest.repeatedPassword(), registerRequest.address());
+        return ResponseEntity.ok(new RegisterResponse("Successfully registered new user."));
     }
 }

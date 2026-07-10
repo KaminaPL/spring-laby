@@ -1,8 +1,11 @@
 package org.example.springlab.web;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.example.springlab.VehicleValidator;
+import org.example.springlab.dto.VehicleAddressChangeRequest;
 import org.example.springlab.models.Vehicle;
 import org.example.springlab.services.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,9 +33,9 @@ public class VehicleController {
     public List<Vehicle> getAll(
             @RequestParam(name = "available", required = false, defaultValue = "false") boolean available
     ) {
-        List<Vehicle> vehicleList = vehicleService.getAll();
+        List<Vehicle> vehicleList = vehicleService.findAll();
         if(available) {
-            vehicleList = vehicleList.stream().filter(v -> !rentalService.activeRentalWithVehicleIdExists(v.getId())).toList();
+            vehicleList = vehicleList.stream().filter(v -> !v.isRented()).toList();
         }
         return vehicleList;
     }
@@ -44,7 +47,6 @@ public class VehicleController {
 
     @PostMapping
     public void add(@RequestBody Vehicle vehicle) {
-        vehicleValidator.validate(vehicle);
         vehicleService.add(vehicle);
     }
 
@@ -52,5 +54,16 @@ public class VehicleController {
     public ResponseEntity<Void> removeById(@PathVariable String id) {
         vehicleService.removeById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/address-change")
+    public ResponseEntity<String> changeAddress(@RequestBody VehicleAddressChangeRequest requestBody) {
+        Vehicle vehicle = vehicleService.findById(requestBody.vehicleId());
+        if(vehicle != null) {
+            vehicle.setAddress(requestBody.address());
+            vehicleService.add(vehicle);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No vehicle with such id.");
     }
 }

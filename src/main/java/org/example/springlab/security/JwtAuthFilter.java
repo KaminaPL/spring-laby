@@ -23,6 +23,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -51,7 +52,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-           // do something cool
+           e.printStackTrace();
         }
         filterChain.doFilter(request, response);
     }

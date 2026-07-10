@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface UserServiceInterface {
 
-    boolean userExists(String id);
+    boolean userExists(User user);
 
-    List<User> getAll();
+    List<User> findAll();
 
     User findById(String id);
 
@@ -17,6 +17,4 @@ public interface UserServiceInterface {
     void removeById(String id);
 
     void add(User user);
-
-    void save();
 }

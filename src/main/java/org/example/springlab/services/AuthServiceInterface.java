@@ -6,5 +6,5 @@ public interface AuthServiceInterface {
 
     User authenticate(String login, String password);
 
-    void register(String login, String password, String passwordConfirmation);
+    void register(String login, String password, String passwordConfirmation, String address);
 }

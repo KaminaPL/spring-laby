@@ -2,7 +2,7 @@ package org.example.springlab.services;
 
 
 import org.example.springlab.models.User;
-import org.example.springlab.repositories.UserRepository;
+import org.example.springlab.repositories.UserJpaRepositoryAdapter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,19 +12,21 @@ import java.util.List;
 @Transactional
 public class UserService implements UserServiceInterface {
 
-    private final UserRepository repository;
+    private final UserJpaRepositoryAdapter repository;
 
-    public UserService(UserRepository repository) {
+    public UserService(UserJpaRepositoryAdapter repository) {
         this.repository = repository;
     }
 
     @Override
-    public boolean userExists(String id) {
-        return repository.findById(id).isPresent();
+    public boolean userExists(User user) {
+        return repository.userExists(user);
     }
 
     @Override
-    public List<User> getAll() { return repository.getAll(); }
+    public List<User> findAll() {
+        return repository.findAll();
+    }
 
     @Override
     public User findById(String id) {
@@ -44,11 +46,7 @@ public class UserService implements UserServiceInterface {
     }
 
     @Override
-    public void add(User user)
-    {
+    public void add(User user) {
         repository.add(user);
     }
-
-    @Override
-    public void save() { repository.save(); }
 }

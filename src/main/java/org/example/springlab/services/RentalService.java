@@ -2,6 +2,7 @@ package org.example.springlab.services;
 
 
 import org.example.springlab.models.Rental;
+import org.example.springlab.repositories.RentalJpaRepositoryAdapter;
 import org.example.springlab.repositories.RentalRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,27 +14,21 @@ import java.util.List;
 @Transactional
 public class RentalService implements RentalServiceInterface {
 
-    private RentalRepository repository;
+    private final RentalJpaRepositoryAdapter repository;
 
-
-    public RentalService(RentalRepository repository) {
+    public RentalService(RentalJpaRepositoryAdapter repository) {
         this.repository = repository;
     }
 
+
     @Override
-    public boolean activeRentalWithUserIdExists(String userId) {
-        return repository.findByUserId(userId).isPresent();
+    public boolean rentalExists(Rental rental) {
+        return repository.rentalExists(rental);
     }
 
     @Override
-    public boolean activeRentalWithVehicleIdExists(String vehicleId) {
-        return repository.findByVehicleId(vehicleId).isPresent();
-    }
-
-    @Override
-    public List<Rental> getAll()
-    {
-        return repository.getAll();
+    public List<Rental> findAll() {
+        return repository.findAll();
     }
 
     @Override
@@ -43,9 +38,15 @@ public class RentalService implements RentalServiceInterface {
     }
 
     @Override
-    public Rental findByIdAndReturnDateIsNull(String id) {
-        return repository.findByIdAndReturnDateIsNull(id)
+    public Rental findByIdAndReturnDateTimeIsNull(String id) {
+        return repository.findByIdAndReturnDateTimeIsNull(id)
                 .orElseThrow(() -> new IllegalArgumentException("No active rental with such id: " + id));
+    }
+
+    @Override
+    public Rental findByUserIdAndReturnDateTimeIsNull(String userId) {
+        return repository.findByUserIdAndReturnDateTimeIsNull(userId)
+                .orElseThrow(() -> new IllegalArgumentException("No rental with such user id: " + userId));
     }
 
     @Override
@@ -71,7 +72,4 @@ public class RentalService implements RentalServiceInterface {
     {
         repository.removeById(id);
     }
-
-    @Override
-    public void save() { repository.save(); }
 }

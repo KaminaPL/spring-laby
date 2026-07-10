@@ -54,13 +54,16 @@ public class SecurityConfig {
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/error").permitAll()
-                                .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers(r -> (r.getMethod().equals("POST") || r.getMethod().equals("DELETE")) &&
-                                        r.getRequestURI().startsWith("/api/vehicles"))
-                                .hasRole("ADMIN")
-                                .anyRequest()
-                                .authenticated()
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/**").permitAll()
+                        .requestMatchers(r -> (r.getMethod().equals("POST") || r.getMethod().equals("DELETE")) &&
+                                r.getRequestURI().startsWith("/api/vehicles")).hasRole("ADMIN")
+                        .requestMatchers(r -> r.getRequestURI().startsWith("/api/rentals")).hasRole("ADMIN")
+                        .requestMatchers(r -> r.getRequestURI().startsWith("/api/users")).hasRole("ADMIN")
+                        .anyRequest().authenticated()
                 ).sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS

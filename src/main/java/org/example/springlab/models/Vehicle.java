@@ -1,13 +1,11 @@
 package org.example.springlab.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 @Getter
@@ -40,6 +38,12 @@ public class Vehicle {
     @Column(nullable = false)
     private double price;
 
+    @Column(nullable = false)
+    private String address;
+
+    @Column(name = "rented", nullable = false)
+    private boolean isRented;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private Map<String, Object> attributes;
@@ -48,12 +52,16 @@ public class Vehicle {
         return attributes.get(key);
     }
 
-    void removeAttribute(String key) {
+    public void removeAttribute(String key) {
         attributes.remove(key);
     }
 
-    void addAttribute(String key, Object value) {
+    public void addAttribute(String key, Object value) {
         attributes.put(key, value);
+    }
+
+    public boolean isRented() {
+        return isRented;
     }
 
     public Vehicle copy() {

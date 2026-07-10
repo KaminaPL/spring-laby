@@ -6,20 +6,22 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RentalRepository {
-    List<Rental> getAll();
+
+    boolean rentalExists(Rental rental);
+
+    List<Rental> findAll();
 
     Optional<Rental> findById(String id);
 
-    Optional<Rental> findByVehicleId(String id);
+    Optional<Rental> findByVehicleId(String vehicleId);
 
-    Optional<Rental> findByUserId(String id);
+    Optional<Rental> findByUserId(String userId);
 
-    Optional<Rental> findByIdAndReturnDateIsNull(String id);
+    Optional<Rental> findByUserIdAndReturnDateTimeIsNull(String userId);
+
+    Optional<Rental> findByIdAndReturnDateTimeIsNull(String id);
 
     void add(Rental rental);
 
     void removeById(String id);
-
-    void save();
-
 }
